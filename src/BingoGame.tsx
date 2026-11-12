@@ -1,6 +1,6 @@
-import { displayTranslation, t, useTranslation } from "./i18n";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { CircleHelp, Download, LoaderCircle, Printer } from "lucide-react";
+import { displayTranslation, t, useTranslation, type Language } from "./i18n";
+import { useEffect, useRef, useState } from "react";
+import { Download, LoaderCircle, Printer } from "lucide-react";
 import { bingoLevels, type BingoLevel, type BingoSize } from "./bingo";
 import { preparePDFPreview } from "./pdf-preview";
 import type { BingoBoardsPerPage } from "./bingo-pdf";
@@ -17,13 +17,15 @@ export default function BingoGame({
   onSheetChange,
   level,
   onLevelChange,
-  settingsContent,
+  language,
+  onLanguageChange,
 }: {
   sheet: BingoSheet;
   onSheetChange: (sheet: BingoSheet) => void;
   level: BingoLevel;
   onLevelChange: (level: BingoLevel) => void;
-  settingsContent: ReactNode;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
 }) {
   useTranslation();
   const [count, setCount] = useState(4);
@@ -88,30 +90,10 @@ export default function BingoGame({
         level={level}
         onLevelChange={onLevelChange}
         onBoardSizeChange={setPrintBoardSize}
-        settingsContent={settingsContent}
-        settingsTools={
-          <div className="settings-tools">
-            <button
-              className="secondary"
-              type="button"
-              aria-label={t("components.BingoGame.howToPlay")}
-              aria-haspopup="dialog"
-              onClick={() => onSheetChange("help")}
-            >
-              <CircleHelp size={21} aria-hidden="true" />
-              {t("components.BingoGame.howToPlay")}
-            </button>
-            <button
-              className="secondary"
-              type="button"
-              aria-haspopup="dialog"
-              onClick={() => onSheetChange("print")}
-            >
-              <Printer size={21} aria-hidden="true" />
-              <span>{t("bingoApp.boards")}</span>
-            </button>
-          </div>
-        }
+        language={language}
+        onLanguageChange={onLanguageChange}
+        onOpenHelp={() => onSheetChange("help")}
+        onOpenPrint={() => onSheetChange("print")}
       />
       {sheet === "help" && (
         <Modal

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import BingoGame from "./BingoGame";
-import AppSettings from "./AppSettings";
 import { getLanguage, setLanguage, useTranslation } from "./i18n";
 import {
   levelStorageKey,
@@ -65,12 +64,8 @@ export default function App() {
           onSheetChange={(sheet) => navigate({ ...route, sheet })}
           level={route.level}
           onLevelChange={(level) => navigate({ ...route, level })}
-          settingsContent={
-            <AppSettings
-              language={language}
-              onLanguageChange={(next) => navigate(route, next)}
-            />
-          }
+          language={language}
+          onLanguageChange={(next) => navigate(route, next)}
         />
       </main>
     </div>

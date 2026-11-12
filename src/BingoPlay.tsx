@@ -4,7 +4,6 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
 import {
   Clock3,
@@ -13,7 +12,6 @@ import {
   Pause,
   PencilLine,
   Play,
-  RotateCcw,
   Settings,
   Shuffle,
   Undo2,
@@ -26,7 +24,8 @@ import {
   type BingoLevel,
   type BingoSize,
 } from "./bingo";
-import { useTranslation } from "./i18n";
+import { useTranslation, type Language } from "./i18n";
+import AppSettings from "./AppSettings";
 import BingoBoard from "./BingoBoard";
 import BingoCelebration from "./BingoCelebration";
 import AnswerModal from "./AnswerModal";
@@ -73,14 +72,18 @@ export default function BingoPlay({
   level,
   onLevelChange,
   onBoardSizeChange,
-  settingsContent,
-  settingsTools,
+  language,
+  onLanguageChange,
+  onOpenHelp,
+  onOpenPrint,
 }: {
   level: BingoLevel;
   onLevelChange: (level: BingoLevel) => void;
   onBoardSizeChange: (size: BingoSize) => void;
-  settingsContent: ReactNode;
-  settingsTools: ReactNode;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
+  onOpenHelp: () => void;
+  onOpenPrint: () => void;
 }) {
   const { t } = useTranslation();
   const pwa = useSyncExternalStore(
@@ -432,79 +435,24 @@ export default function BingoPlay({
         aria-label={t("settings.title")}
         hidden={view !== "settings"}
       >
-        <h2>{t("settings.title")}</h2>
-        <section
-          className="settings-card"
-          aria-labelledby="settings-game-title"
-        >
-          <h3 id="settings-game-title">{t("settings.game")}</h3>
-          <fieldset className="settings-level">
-            <legend>{t("components.BingoGame.questionLevel")}</legend>
-            <div className="bingo-level">
-              {Object.entries(bingoLevels).map(([value, name]) => (
-                <label className="bingo-level-option" key={value}>
-                  <input
-                    type="radio"
-                    name="bingo-level"
-                    checked={level === value}
-                    onChange={() => onLevelChange(value as BingoLevel)}
-                  />
-                  <span>{name}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <p className="settings-board-size">
-            {t("settings.currentBoard", { size: game.size })}
-          </p>
-          <p className="settings-hint">{t("settings.newBoardHint")}</p>
-          <button
-            className="secondary settings-new-game"
-            aria-haspopup="dialog"
-            onClick={() => {
-              setSetupSize(game.size);
-              setSetup(true);
-            }}
-          >
-            <RotateCcw size={17} aria-hidden="true" />
-            {t("play.newGame")}
-          </button>
-        </section>
-        <section
-          className="settings-card"
-          aria-labelledby="settings-round-title"
-        >
-          <h3 id="settings-round-title">{t("settings.round")}</h3>
-          <span className="settings-field-label">
-            {t("settings.roundTime")}
-          </span>
-          <button
-            className="secondary play-time-setting"
-            onClick={editTime}
-            aria-haspopup="dialog"
-          >
-            <Clock3 size={17} aria-hidden="true" />
-            {game.roundDurationMs / 1000} {t("play.seconds")} ·{" "}
-            {t("play.editTime")}
-          </button>
-          <label className="play-sound">
-            <input type="checkbox" checked={sound} onChange={enableSound} />
-            {t("play.sound")}
-          </label>
-          {!soundSaved && (
-            <p className="error" role="status">
-              {t("settings.preferenceSaveFailed")}
-            </p>
-          )}
-        </section>
-        <section
-          className="settings-card"
-          aria-labelledby="settings-tools-title"
-        >
-          <h3 id="settings-tools-title">{t("settings.tools")}</h3>
-          {settingsTools}
-        </section>
-        {settingsContent}
+        <AppSettings
+          level={level}
+          onLevelChange={onLevelChange}
+          size={game.size}
+          onNewGame={() => {
+            setSetupSize(game.size);
+            setSetup(true);
+          }}
+          roundDurationMs={game.roundDurationMs}
+          onEditTime={editTime}
+          sound={sound}
+          onSoundChange={enableSound}
+          soundSaved={soundSaved}
+          language={language}
+          onLanguageChange={onLanguageChange}
+          onOpenHelp={onOpenHelp}
+          onOpenPrint={onOpenPrint}
+        />
       </section>
       <nav className="play-navigation" aria-label={t("play.navigation")}>
         <button
