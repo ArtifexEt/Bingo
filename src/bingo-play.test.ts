@@ -17,6 +17,8 @@ import {
   setAnswer,
   startTieBreak,
   startTimer,
+  setRoundDuration,
+  isRoundDuration,
   winningLines,
   type BingoSession,
 } from "./bingo-play";
@@ -670,7 +672,7 @@ describe("different board sizes", () => {
 
   it("restores legacy v1 saves without a size as 5×5 and rejects unknown keys", () => {
     const game = correctCell(session(), "player-1", 24);
-    const { size: _size, ...legacy } = game;
+    const { size: _size, roundDurationMs: _duration, ...legacy } = game;
     expect(parseStoredSession(JSON.stringify(legacy))).toEqual({
       ...game,
       size: 5,
@@ -686,5 +688,190 @@ describe("different board sizes", () => {
         parseStoredSession(JSON.stringify({ ...session(), size })),
       ).toBeNull();
     }
+  });
+});
+
+describe("configurable round duration", () => {
+  it("defaults to 25 seconds and creates rounds from one second to five minutes", () => {
+    expect(session().roundDurationMs).toBe(BINGO_ROUND_MS);
+    for (const duration of [1_000, 45_000, 300_000]) {
+      const game = createSession("expert", ["Ada"], "custom-time", 3, duration);
+      expect(game.roundDurationMs).toBe(duration);
+      expect(game.round.remainingMs).toBe(duration);
+      const answering = drawRound(game, 1);
+      expect(answering.round.remainingMs).toBe(duration);
+      expect(startTimer(answering, 1000).round.deadline).toBe(1000 + duration);
+      expect(parseStoredSession(JSON.stringify(game))).toEqual(game);
+    }
+  });
+
+  it("accepts only whole seconds in the supported range", () => {
+    for (const duration of [
+      0,
+      -1_000,
+      999,
+      1_001,
+      25_500,
+      300_001,
+      301_000,
+      NaN,
+      Infinity,
+      "25000",
+      null,
+      undefined,
+      [],
+      {},
+    ]) {
+      expect(isRoundDuration(duration)).toBe(false);
+      const game = session();
+      expect(setRoundDuration(game, duration as number)).toBe(game);
+    }
+    for (const duration of [1_000, 25_000, 300_000])
+      expect(isRoundDuration(duration)).toBe(true);
+    for (const duration of [0, 999, 1_001, 301_000, NaN, Infinity])
+      expect(() =>
+        createSession("expert", ["Ada"], "invalid-time", 5, duration),
+      ).toThrow();
+  });
+
+  it("changes a ready round without replacing boards, marks or answers", () => {
+    let previous = correctCell(session(), "player-1", 24);
+    previous = {
+      ...previous,
+      players: previous.players.map((player) => ({
+        ...player,
+        answer: "1984",
+      })),
+    };
+    freeze(previous);
+    const game = setRoundDuration(previous, 45_000);
+    expect(game.id).toBe(previous.id);
+    expect(game.size).toBe(previous.size);
+    expect(game.players).toBe(previous.players);
+    expect(game.roundDurationMs).toBe(45_000);
+    expect(game.round.remainingMs).toBe(45_000);
+    expect(previous.round.remainingMs).toBe(25_000);
+    expect(parseStoredSession(JSON.stringify(game))).toEqual(game);
+    expect(setRoundDuration(game, 45_000)).toBe(game);
+  });
+
+  it("resets a paused answer timer to the new duration before restarting", () => {
+    const answering = drawRound(session(), 2);
+    const running = startTimer(answering, 1000);
+    const paused = pauseTimer(running, 6000);
+    expect(paused.round.remainingMs).toBe(20_000);
+    const changed = setRoundDuration(freeze(paused), 60_000);
+    expect(changed.roundDurationMs).toBe(60_000);
+    expect(changed.round.remainingMs).toBe(60_000);
+    expect(changed.round.phase).toBe("answering");
+    expect(changed.round.deadline).toBeNull();
+    const restarted = startTimer(changed, 10_000);
+    expect(restarted.round.deadline).toBe(70_000);
+    expect(pauseTimer(restarted, 20_000).round.remainingMs).toBe(50_000);
+    expect(parseStoredSession(JSON.stringify(restarted))).toEqual(restarted);
+  });
+
+  it("can reset the same allowance on a paused or expired answer timer", () => {
+    const running = startTimer(drawRound(session(), 0), 1000);
+    for (const now of [6000, 30_000]) {
+      const paused = pauseTimer(running, now);
+      const reset = setRoundDuration(paused, 25_000);
+      expect(reset.round.remainingMs).toBe(25_000);
+      expect(startTimer(reset, 40_000).round.deadline).toBe(65_000);
+    }
+  });
+
+  it("does not change a running deadline or its configured allowance", () => {
+    const running = freeze(startTimer(drawRound(session(), 0), 1000));
+    expect(setRoundDuration(running, 10_000)).toBe(running);
+    expect(setRoundDuration(running, 60_000)).toBe(running);
+    expect(running.roundDurationMs).toBe(25_000);
+    expect(running.round.deadline).toBe(26_000);
+    expect(parseStoredSession(JSON.stringify(running))).toEqual(running);
+  });
+
+  it("changes future rounds only while answers are being checked", () => {
+    const checked = freeze(checking(1));
+    const changed = setRoundDuration(checked, 10_000);
+    expect(changed.round).toBe(checked.round);
+    expect(changed.round.remainingMs).toBe(0);
+    expect(changed.roundDurationMs).toBe(10_000);
+    expect(setRoundDuration(changed, 10_000)).toBe(changed);
+    const next = drawRound(changed, 4);
+    expect(next.round.remainingMs).toBe(10_000);
+    expect(startTimer(next, 10_000).round.deadline).toBe(20_000);
+    expect(parseStoredSession(JSON.stringify(changed))).toEqual(changed);
+  });
+
+  it("uses the configured allowance when starting or continuing tie-breaks", () => {
+    const tied = startTieBreak(setRoundDuration(tiedGame(), 45_000));
+    expect(tied.round.remainingMs).toBe(45_000);
+    let rated = finishRound(drawRound(tied, 0));
+    for (const player of rated.players)
+      rated = recordTieAnswer(rated, player.id, false);
+    const continued = resolveTieBreak(rated);
+    expect(continued.round.remainingMs).toBe(45_000);
+    expect(continued.roundDurationMs).toBe(45_000);
+    expect(parseStoredSession(JSON.stringify(continued))).toEqual(continued);
+  });
+
+  it("restores both legacy save shapes with the default allowance", () => {
+    const current = startTimer(drawRound(session(), 1), 1000);
+    const { roundDurationMs: _duration, ...sizeAware } = current;
+    const { size: _size, ...original } = sizeAware;
+    for (const legacy of [sizeAware, original]) {
+      const restored = parseStoredSession(JSON.stringify(legacy));
+      expect(restored).toEqual(current);
+      expect(restored!.round.deadline).toBe(26_000);
+      expect(restored!.players).toEqual(current.players);
+    }
+  });
+
+  it("rejects unsupported duration fields and incomplete or unknown save schemas", () => {
+    for (const duration of [0, 999, 1_001, 301_000, "25000", null, [], {}])
+      expect(
+        parseStoredSession(
+          JSON.stringify({ ...session(), roundDurationMs: duration }),
+        ),
+      ).toBeNull();
+    const { size: _size, ...missingSize } = session();
+    expect(parseStoredSession(JSON.stringify(missingSize))).toBeNull();
+    expect(
+      parseStoredSession(JSON.stringify({ ...session(), futureField: 1 })),
+    ).toBeNull();
+  });
+
+  it("validates saved remaining time against the selected allowance", () => {
+    const ready = createSession(
+      "beginner",
+      ["Ada"],
+      "custom-bounds",
+      4,
+      60_000,
+    );
+    expect(parseStoredSession(JSON.stringify(ready))).toEqual(ready);
+    const answering = drawRound(ready, 1);
+    expect(
+      parseStoredSession(
+        JSON.stringify({
+          ...answering,
+          round: { ...answering.round, remainingMs: 60_001 },
+        }),
+      ),
+    ).toBeNull();
+    expect(
+      parseStoredSession(
+        JSON.stringify({
+          ...ready,
+          round: { ...ready.round, remainingMs: 25_000 },
+        }),
+      ),
+    ).toBeNull();
+    const paused = pauseTimer(startTimer(answering, 1000), 31_000);
+    expect(paused.round.remainingMs).toBe(30_000);
+    expect(parseStoredSession(JSON.stringify(paused))).toEqual(paused);
+    expect(parseStoredSession(JSON.stringify(finishRound(paused)))).toEqual(
+      finishRound(paused),
+    );
   });
 });

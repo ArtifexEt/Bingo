@@ -11,6 +11,7 @@ import {
   resolveTieBreak,
   startTieBreak,
   startTimer,
+  setRoundDuration,
   type BingoSession,
 } from "./bingo-play";
 import { personalSession } from "./bingo-personal";
@@ -130,5 +131,25 @@ describe("personal Bingo session migration", () => {
       expect(game.round.remainingMs).toBe(previous.round.remainingMs);
       expectRestorable(game);
     }
+  });
+
+  it("keeps a custom allowance while converting a ready tie-break", () => {
+    const previous = setRoundDuration(tiedSession(), 60_000);
+    const game = personalSession(previous);
+    expect(game.roundDurationMs).toBe(60_000);
+    expect(game.round.remainingMs).toBe(60_000);
+    expect(game.players[0].seed).toBe(previous.players[0].seed);
+    expect(game.players[0].marks).toEqual(previous.players[0].marks);
+    expectRestorable(game);
+  });
+
+  it("preserves the deadline and remaining time of a custom running round", () => {
+    const configured = setRoundDuration(sharedSession(), 90_000);
+    const previous = startTimer(drawRound(configured, 1), 1000);
+    const game = personalSession(previous);
+    expect(game.roundDurationMs).toBe(90_000);
+    expect(game.round.deadline).toBe(91_000);
+    expect(game.round.remainingMs).toBe(90_000);
+    expectRestorable(game);
   });
 });

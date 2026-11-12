@@ -8,7 +8,7 @@
   "components.BingoGame.drawAnotherChallenge": "Draw another category",
   "components.BingoGame.drawAChallenge": "Draw a category",
   "components.BingoGame.howToPlay": "How to play",
-  "components.BingoGame.drawACategoryAndScanA": "Draw a category and scan a music card as usual. Take 25 seconds to answer, then flip the card. A correct answer lets you mark one free square in that category. Complete a row, column or diagonal to get Bingo.",
+  "components.BingoGame.drawACategoryAndScanA": "Draw a category and scan a music card as usual. Agree on an answer time and start the countdown when the music begins, then flip the card when time is up. A correct answer lets you mark one free square in that category. Complete a row, column or diagonal to get Bingo.",
   "components.BingoGame.atBeginnerLevelGuessingTheExact": "At beginner level, guessing the exact year in the ±2 and ±4 categories also lets you remove one opponent's mark. Every draw is independent, so a category may repeat.",
   "components.BingoGame.printableBoards": "Printable boards",
   "components.BingoGame.numberOfBoards": "Number of boards",

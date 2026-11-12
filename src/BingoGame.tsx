@@ -13,13 +13,11 @@ import "./bingo.css";
 export type BingoSheet = "help" | "print" | null;
 
 export default function BingoGame({
-  scannerUrl,
   sheet,
   onSheetChange,
   level,
   onLevelChange,
 }: {
-  scannerUrl: string;
   sheet: BingoSheet;
   onSheetChange: (sheet: BingoSheet) => void;
   level: BingoLevel;
@@ -29,9 +27,13 @@ export default function BingoGame({
   const [count, setCount] = useState(4);
   const [boardsPerPage, setBoardsPerPage] = useState<BingoBoardsPerPage>(2);
   const [printBoardSize, setPrintBoardSize] = useState<BingoSize>(5);
+  const [printLevel, setPrintLevel] = useState<BingoLevel>(level);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const printController = useRef<AbortController | null>(null);
+  useEffect(() => {
+    setPrintLevel(level);
+  }, [level]);
   useEffect(() => {
     if (sheet !== "print") printController.current?.abort();
   }, [sheet]);
@@ -49,7 +51,7 @@ export default function BingoGame({
     setBusy(true);
     try {
       const { buildBingoPDF } = await import("./bingo-pdf");
-      const doc = await buildBingoPDF(level, count, crypto.randomUUID(), {
+      const doc = await buildBingoPDF(printLevel, count, crypto.randomUUID(), {
         boardsPerPage,
         boardSize: printBoardSize,
         signal: controller.signal,
@@ -104,7 +106,6 @@ export default function BingoGame({
         level={level}
         onLevelChange={onLevelChange}
         onBoardSizeChange={setPrintBoardSize}
-        scannerUrl={scannerUrl}
       />
       {sheet === "help" && (
         <Modal
@@ -170,10 +171,24 @@ export default function BingoGame({
                   ))}
                 </select>
               </label>
-              <span>
-                {t("components.BingoGame.level")}{" "}
-                <strong>{bingoLevels[level]}</strong>
-              </span>
+              <label className="bingo-print-level">
+                {t("components.BingoGame.level")}
+                <select
+                  value={printLevel}
+                  disabled={busy}
+                  onChange={(event) => {
+                    const next = event.target.value;
+                    if (next === "beginner" || next === "expert")
+                      setPrintLevel(next);
+                  }}
+                >
+                  {(["beginner", "expert"] as const).map((value) => (
+                    <option key={value} value={value}>
+                      {bingoLevels[value]}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
             {error && (
               <p className="error" role="alert">

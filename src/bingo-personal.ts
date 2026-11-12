@@ -1,4 +1,4 @@
-import { BINGO_ROUND_MS, type BingoSession } from "./bingo-play";
+import type { BingoSession } from "./bingo-play";
 
 /** Keep the selected board when upgrading a shared-device game to personal play. */
 export function personalSession(session: BingoSession): BingoSession {
@@ -15,7 +15,7 @@ export function personalSession(session: BingoSession): BingoSession {
           category: null,
           phase: "ready" as const,
           deadline: null,
-          remainingMs: BINGO_ROUND_MS,
+          remainingMs: session.roundDurationMs,
           scored: [],
           bonusUsed: [],
         }

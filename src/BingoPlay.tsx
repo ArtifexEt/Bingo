@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, ScanLine, Shuffle, Undo2 } from "lucide-react";
+import {
+  Clock3,
+  Grid3X3,
+  Pause,
+  Play,
+  RotateCcw,
+  Shuffle,
+  Undo2,
+} from "lucide-react";
 import {
   bingoCategories,
   bingoColors,
@@ -15,13 +23,14 @@ import AnswerModal from "./AnswerModal";
 import BoardSizeSelect from "./BoardSizeSelect";
 import Modal from "./Modal";
 import {
-  BINGO_ROUND_MS,
   correctCell,
   createSession,
   drawRound,
   finishRound,
   parseStoredSession,
   pauseTimer,
+  isRoundDuration,
+  setRoundDuration,
   startTimer,
   winningLines,
   type BingoSession,
@@ -29,10 +38,14 @@ import {
 import { personalSession } from "./bingo-personal";
 import "./bingo-play.css";
 
-const storageKey = (level: BingoLevel) => `bingo-game-${level}-v2`;
+const storageKey = (level: BingoLevel) => `bingo-game-${level}-v3`;
 function readGame(level: BingoLevel) {
-  // Keep the size-aware save separate so an older open tab cannot overwrite it.
-  for (const key of [storageKey(level), `bingo-game-${level}-v1`]) {
+  // Older open tabs must not overwrite the configurable timer or board size.
+  for (const key of [
+    storageKey(level),
+    `bingo-game-${level}-v2`,
+    `bingo-game-${level}-v1`,
+  ]) {
     try {
       const saved = parseStoredSession(localStorage.getItem(key));
       if (saved?.level === level) return personalSession(saved);
@@ -47,12 +60,10 @@ export default function BingoPlay({
   level,
   onLevelChange,
   onBoardSizeChange,
-  scannerUrl,
 }: {
   level: BingoLevel;
   onLevelChange: (level: BingoLevel) => void;
   onBoardSizeChange: (size: BingoSize) => void;
-  scannerUrl: string;
 }) {
   const { t } = useTranslation();
   const [game, setGame] = useState(() => readGame(level));
@@ -65,6 +76,10 @@ export default function BingoPlay({
   const [saving, setSaving] = useState(true);
   const [confirmDraw, setConfirmDraw] = useState(false);
   const [sound, setSound] = useState(false);
+  const [view, setView] = useState<"play" | "host">("play");
+  const [timeOpen, setTimeOpen] = useState(false);
+  const [timeDraft, setTimeDraft] = useState("");
+  const [timeError, setTimeError] = useState(false);
   const [celebration, setCelebration] = useState<number | null>(null);
   const celebrationCount = useRef(0);
   const finishCelebration = useCallback(() => setCelebration(null), []);
@@ -91,6 +106,7 @@ export default function BingoPlay({
       setSetup(false);
       setAnswerOpen(false);
       setConfirmDraw(false);
+      setTimeOpen(false);
       setError("");
     }
   }, [level, game.level]);
@@ -199,6 +215,16 @@ export default function BingoPlay({
       }
     }
   }
+  function editTime() {
+    apply(pausedSnapshot(game));
+    setTimeDraft(String(game.roundDurationMs / 1000));
+    setTimeError(false);
+    setTimeOpen(true);
+  }
+  function changeView(next: "play" | "host") {
+    setView(next);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
 
   return (
     <div className="bingo-play">
@@ -222,7 +248,7 @@ export default function BingoPlay({
             </label>
           ))}
         </fieldset>
-        <div className="play-board-tools">
+        <div className="play-board-tools" hidden={view !== "play"}>
           <button className="quiet" disabled={!past.length} onClick={undo}>
             <Undo2 size={17} aria-hidden="true" />
             {t("play.undo")}
@@ -249,7 +275,11 @@ export default function BingoPlay({
           {error}
         </p>
       )}
-      <section className="play-board-panel" aria-label={t("board.title")}>
+      <section
+        className="play-board-panel"
+        aria-label={t("board.title")}
+        hidden={view !== "play"}
+      >
         <BingoBoard
           board={player}
           level={game.level}
@@ -267,9 +297,22 @@ export default function BingoPlay({
           {t(player.answer ? "play.savedAnswer" : "play.answer")}
         </button>
       </section>
-      <details className="play-host">
-        <summary>{t("play.roundPanel")}</summary>
+      <section
+        className="play-host"
+        aria-label={t("play.roundPanel")}
+        hidden={view !== "host"}
+      >
+        <h2>{t("play.roundPanel")}</h2>
         <p className="play-host-hint">{t("play.hostHint")}</p>
+        <button
+          className="secondary play-time-setting"
+          onClick={editTime}
+          aria-haspopup="dialog"
+        >
+          <Clock3 size={17} aria-hidden="true" />
+          {game.roundDurationMs / 1000} {t("play.seconds")} ·{" "}
+          {t("play.editTime")}
+        </button>
         <section className="play-round" aria-label={t("play.roundPanel")}>
           <div
             className="play-question"
@@ -307,9 +350,11 @@ export default function BingoPlay({
                       )}
                       {deadline !== null
                         ? t("play.pause")
-                        : remaining < BINGO_ROUND_MS
+                        : remaining < game.roundDurationMs
                           ? t("play.resume")
-                          : t("play.startTimer")}
+                          : t("play.startTimer", {
+                              seconds: game.roundDurationMs / 1000,
+                            })}
                     </button>
                     <button
                       className="quiet"
@@ -342,17 +387,89 @@ export default function BingoPlay({
               ? t("play.nextRound")
               : t("components.BingoGame.drawAChallenge")}
           </button>
-          <a
-            className="bingo-scanner-link"
-            href={scannerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ScanLine size={18} aria-hidden="true" />
-            {t("bingoApp.scanCard")}
-          </a>
         </section>
-      </details>
+      </section>
+      <nav className="play-navigation" aria-label={t("play.navigation")}>
+        <button
+          type="button"
+          aria-current={view === "play" ? "page" : undefined}
+          onClick={() => changeView("play")}
+        >
+          <Grid3X3 size={22} aria-hidden="true" />
+          <span>{t("play.playTab")}</span>
+        </button>
+        <button
+          type="button"
+          aria-current={view === "host" ? "page" : undefined}
+          onClick={() => changeView("host")}
+        >
+          <Clock3 size={22} aria-hidden="true" />
+          <span>{t("play.roundPanel")}</span>
+        </button>
+      </nav>
+      {timeOpen && (
+        <Modal
+          title={t("play.editTime")}
+          onClose={() => setTimeOpen(false)}
+          sheet
+        >
+          <form
+            noValidate
+            onSubmit={(event) => {
+              event.preventDefault();
+              const duration = Number(timeDraft) * 1000;
+              if (!/^\d+$/.test(timeDraft) || !isRoundDuration(duration)) {
+                setTimeError(true);
+                return;
+              }
+              apply(setRoundDuration(game, duration));
+              setPast((history) =>
+                history.map((previous) => setRoundDuration(previous, duration)),
+              );
+              setTimeOpen(false);
+            }}
+          >
+            <label className="play-time-field">
+              {t("play.roundDuration")}
+              <input
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={300}
+                step={1}
+                value={timeDraft}
+                aria-invalid={timeError || undefined}
+                aria-describedby="play-time-hint"
+                onChange={(event) => {
+                  setTimeDraft(event.target.value);
+                  setTimeError(false);
+                }}
+                autoFocus
+              />
+            </label>
+            <p id="play-time-hint" className="play-host-hint">
+              {t("play.timeHint")} {t("play.timePaused")}
+            </p>
+            {timeError && (
+              <p className="error" role="alert">
+                {t("play.timeInvalid")}
+              </p>
+            )}
+            <div className="play-setup-actions">
+              <button className="primary" type="submit">
+                {t("play.setTime")}
+              </button>
+              <button
+                className="quiet"
+                type="button"
+                onClick={() => setTimeOpen(false)}
+              >
+                {t("shell.cancel")}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
       {answerOpen && (
         <AnswerModal
           level={game.level}
@@ -374,7 +491,15 @@ export default function BingoPlay({
             <button
               className="primary"
               onClick={() => {
-                apply(createSession(level, ["1"], undefined, setupSize));
+                apply(
+                  createSession(
+                    level,
+                    ["1"],
+                    undefined,
+                    setupSize,
+                    game.roundDurationMs,
+                  ),
+                );
                 setPast([]);
                 setSetup(false);
                 setNow(Date.now());

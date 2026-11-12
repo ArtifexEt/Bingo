@@ -68,7 +68,6 @@ export default function App() {
     <div className="bingo-app">
       <main>
         <BingoGame
-          scannerUrl={hiciarzUrl("scanner", language)}
           sheet={route.sheet}
           onSheetChange={(sheet) => navigate({ ...route, sheet })}
           level={route.level}
@@ -79,16 +78,16 @@ export default function App() {
         <div className="app-toolbar">
           <div className="footer-links">
             <a
-              className="creator-link"
+              className="creator-link footer-link"
               href={hiciarzUrl("editor", language)}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t("shell.createCards")}{" "}
-              <ExternalLink size={15} aria-hidden="true" />
+              <ExternalLink size={17} aria-hidden="true" />
+              {t("shell.createCards")}
             </a>
             <a
-              className="support-link"
+              className="support-link footer-link"
               href="https://buymeacoffee.com/szymonrybka"
               target="_blank"
               rel="noopener noreferrer"

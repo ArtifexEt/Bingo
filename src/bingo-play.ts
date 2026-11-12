@@ -6,6 +6,8 @@ import {
 } from "./bingo";
 
 export const BINGO_ROUND_MS = 25_000;
+export const MIN_BINGO_ROUND_MS = 1_000;
+export const MAX_BINGO_ROUND_MS = 300_000;
 export const MAX_BINGO_PLAYERS = 12;
 export const MAX_PLAYER_NAME_LENGTH = 40;
 export const MAX_ANSWER_LENGTH = 240;
@@ -35,6 +37,7 @@ export interface BingoSession {
   id: string;
   level: BingoLevel;
   size: BingoSize;
+  roundDurationMs: number;
   players: BingoPlayer[];
   activePlayerId: string;
   round: BingoRound;
@@ -47,17 +50,23 @@ const isCell = (value: number, size: BingoSize) =>
 const isCategory = (value: number) =>
   Number.isInteger(value) && value >= 0 && value < 5;
 const isTime = (value: number) => Number.isSafeInteger(value) && value >= 0;
+export const isRoundDuration = (value: unknown): value is number =>
+  typeof value === "number" &&
+  Number.isInteger(value) &&
+  value >= MIN_BINGO_ROUND_MS &&
+  value <= MAX_BINGO_ROUND_MS &&
+  value % 1_000 === 0;
 const isBonusCategory = (session: BingoSession) =>
   session.level === "beginner" &&
   (session.round.category === 2 || session.round.category === 4);
 
-function readyRound(number: number): BingoRound {
+function readyRound(number: number, durationMs: number): BingoRound {
   return {
     number,
     category: null,
     phase: "ready",
     deadline: null,
-    remainingMs: BINGO_ROUND_MS,
+    remainingMs: durationMs,
     scored: [],
     bonusUsed: [],
   };
@@ -83,10 +92,13 @@ export function createSession(
   names: string[],
   seed?: string,
   size: BingoSize = 5,
+  roundDurationMs: number = BINGO_ROUND_MS,
 ): BingoSession {
   if (level !== "beginner" && level !== "expert")
     throw new Error("Invalid Bingo level");
   if (!isBingoSize(size)) throw new Error("Invalid Bingo size");
+  if (!isRoundDuration(roundDurationMs))
+    throw new Error("Invalid Bingo round duration");
   const baseSeed =
     (seed ?? generatedSeed())
       .replace(/[\u0000-\u001f\u007f]/g, " ")
@@ -111,9 +123,10 @@ export function createSession(
     id: sessionId(baseSeed),
     level,
     size,
+    roundDurationMs,
     players,
     activePlayerId: players[0].id,
-    round: readyRound(0),
+    round: readyRound(0, roundDurationMs),
     tieBreak: null,
     winnerId: null,
   };
@@ -136,11 +149,33 @@ export function drawRound(
       player.answer === "" ? player : { ...player, answer: "" },
     ),
     round: {
-      ...readyRound(session.round.number + 1),
+      ...readyRound(session.round.number + 1, session.roundDurationMs),
       category,
       phase: "answering",
     },
     tieBreak: session.tieBreak ? { ...session.tieBreak, correct: [] } : null,
+  };
+}
+
+/** A running round keeps its deadline; a paused round restarts with the new allowance. */
+export function setRoundDuration(
+  session: BingoSession,
+  durationMs: number,
+): BingoSession {
+  if (!isRoundDuration(durationMs) || session.round.deadline !== null)
+    return session;
+  const resetTimer = session.round.phase !== "checking";
+  if (
+    session.roundDurationMs === durationMs &&
+    (!resetTimer || session.round.remainingMs === durationMs)
+  )
+    return session;
+  return {
+    ...session,
+    roundDurationMs: durationMs,
+    round: resetTimer
+      ? { ...session.round, remainingMs: durationMs }
+      : session.round,
   };
 }
 
@@ -356,7 +391,7 @@ export function startTieBreak(session: BingoSession): BingoSession {
   if (contenders.length < 2) return session;
   return {
     ...session,
-    round: readyRound(session.round.number),
+    round: readyRound(session.round.number, session.roundDurationMs),
     tieBreak: { contenders, correct: [] },
   };
 }
@@ -400,7 +435,7 @@ export function resolveTieBreak(session: BingoSession): BingoSession {
     return { ...session, tieBreak: null, winnerId: tie.correct[0] };
   return {
     ...session,
-    round: readyRound(session.round.number),
+    round: readyRound(session.round.number, session.roundDurationMs),
     tieBreak: {
       contenders: tie.correct.length > 1 ? [...tie.correct] : tie.contenders,
       correct: [],
@@ -474,6 +509,18 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
           "round",
           "tieBreak",
           "winnerId",
+        ]) &&
+        !record(value, [
+          "version",
+          "id",
+          "level",
+          "size",
+          "roundDurationMs",
+          "players",
+          "activePlayerId",
+          "round",
+          "tieBreak",
+          "winnerId",
         ])) ||
       value.version !== 1 ||
       !text(value.id, 160) ||
@@ -485,6 +532,10 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
       return null;
     const size = Object.hasOwn(value, "size") ? value.size : 5;
     if (!isBingoSize(size)) return null;
+    const roundDurationMs = Object.hasOwn(value, "roundDurationMs")
+      ? value.roundDurationMs
+      : BINGO_ROUND_MS;
+    if (!isRoundDuration(roundDurationMs)) return null;
     const players: BingoPlayer[] = [];
     for (const player of value.players) {
       if (
@@ -538,7 +589,7 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
       typeof round.remainingMs !== "number" ||
       !Number.isInteger(round.remainingMs) ||
       round.remainingMs < 0 ||
-      round.remainingMs > BINGO_ROUND_MS ||
+      round.remainingMs > roundDurationMs ||
       (round.deadline !== null &&
         (typeof round.deadline !== "number" || !isTime(round.deadline))) ||
       !uniqueIds(round.scored, ids) ||
@@ -551,7 +602,7 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
       if (
         round.category !== null ||
         round.deadline !== null ||
-        round.remainingMs !== BINGO_ROUND_MS ||
+        round.remainingMs !== roundDurationMs ||
         round.scored.length ||
         round.bonusUsed.length
       )
@@ -611,6 +662,7 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
       id: value.id,
       level: value.level,
       size,
+      roundDurationMs,
       players,
       activePlayerId: value.activePlayerId,
       round: {
