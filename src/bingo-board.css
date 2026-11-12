@@ -10,8 +10,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 3px 12px;
+  gap: 10px;
+  min-height: 32px;
+  padding: 0 3px;
+  margin-bottom: 9px;
 }
 
 .digital-bingo-board-heading h3 {
@@ -19,55 +21,78 @@
   margin: 0;
   color: var(--ink, #22262c);
   font:
-    600 clamp(18px, 5.3cqi, 24px) / 1.3 Noto,
+    600 clamp(15px, 4cqi, 18px) / 1.3 Noto,
     sans-serif;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
   overflow-wrap: anywhere;
+}
+
+.digital-bingo-board-meta {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 7px;
 }
 
 .digital-bingo-board-score {
   display: flex;
   flex-shrink: 0;
   align-items: baseline;
-  gap: 5px;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid #dce2d9;
+  border-radius: 8px;
+  background: #fff;
   color: #526454;
   font:
-    400 12px / 1.2 Noto,
+    400 11px / 1.2 Noto,
     sans-serif;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .digital-bingo-board-score strong {
   color: #123f36;
   font:
-    600 clamp(26px, 7cqi, 34px) / 1 "Barlow Condensed",
+    600 21px / 1 "Barlow Condensed",
     Noto,
     sans-serif;
 }
 
-.digital-bingo-board-status {
-  color: #123f36;
-  font:
-    600 25px / 1 "Barlow Condensed",
-    Noto,
-    sans-serif;
-}
-
-.digital-bingo-board-status:not(:empty) {
-  display: flex;
+.digital-bingo-board-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  margin: 0 3px 12px;
-  padding: 10px 12px;
-  border: 2px solid #123f36;
-  border-radius: 10px;
-  background: #e0ebdf;
+  min-height: 29px;
+  padding: 4px 8px;
+  border: 1px solid #b5ccaa;
+  border-radius: 8px;
+  background: #e1edda;
+  color: #123f36;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.digital-bingo-board-progress {
+  height: 3px;
+  margin: 0 3px 9px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #e0e6dd;
+}
+
+.digital-bingo-board-progress > span {
+  display: block;
+  width: var(--marked-progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: #31583d;
+  transition: width 0.18s ease;
 }
 
 .digital-bingo-grid {
   display: grid;
   grid-template-columns: repeat(var(--board-size, 5), minmax(0, 1fr));
-  gap: clamp(4px, 1.25cqi, 6px);
+  gap: clamp(4px, 1.2cqi, 6px);
   padding: 3px;
 }
 
@@ -76,25 +101,27 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 4px;
+  gap: 3px;
   aspect-ratio: 1;
   width: 100%;
   min-width: 0;
-  min-height: 68px;
+  min-height: 64px;
   margin: 0;
-  padding: clamp(5px, 1.6cqi, 8px) clamp(3px, 1cqi, 5px);
+  padding: clamp(5px, 1.5cqi, 8px) clamp(3px, 1.2cqi, 6px);
   border: 2px solid transparent;
-  border-radius: clamp(8px, 2.5cqi, 12px);
+  border-radius: clamp(8px, 2.2cqi, 11px);
   color: var(--cell-ink);
   background: var(--cell-fill);
-  text-align: center;
+  text-align: left;
+  box-shadow: 0 1px 2px #123f3608;
   -webkit-user-select: none;
   user-select: none;
   touch-action: manipulation;
   transition:
     border-color 0.12s,
     background-color 0.15s,
-    color 0.15s;
+    color 0.15s,
+    box-shadow 0.15s;
 }
 
 .digital-bingo-cell:disabled {
@@ -104,11 +131,7 @@
 
 .digital-bingo-cell.is-current-category {
   border-color: var(--cell-ink);
-}
-
-.digital-bingo-cell:hover:not(:disabled) {
-  border-color: var(--cell-ink);
-  filter: none;
+  box-shadow: inset 0 0 0 1px var(--cell-ink);
 }
 
 .digital-bingo-cell.is-marked {
@@ -116,10 +139,6 @@
   background: #d9ddda;
   border-color: #a1aaa4;
   box-shadow: inset 0 2px 4px #263d2e12;
-}
-
-.digital-bingo-cell.is-marked:hover:not(:disabled) {
-  border-color: #646b68;
 }
 
 .digital-bingo-cell.is-marked::after {
@@ -158,17 +177,16 @@
 .digital-bingo-cell-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 2px;
   width: 100%;
   min-width: 0;
-  min-height: 24px;
+  min-height: 22px;
 }
 
 .digital-bingo-cell-number {
-  padding-left: 2px;
   font:
-    600 clamp(24px, 7cqi, 32px) / 1 "Barlow Condensed",
+    600 clamp(23px, 7cqi, 32px) / 1 "Barlow Condensed",
     Noto,
     sans-serif;
 }
@@ -177,7 +195,7 @@
   display: block;
   width: 100%;
   font:
-    600 clamp(10px, 2.8cqi, 13px) / 1.18 Noto,
+    600 clamp(10px, 2.7cqi, 12px) / 1.2 Noto,
     sans-serif;
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -185,6 +203,11 @@
 
 .digital-bingo-board[data-size="3"] .digital-bingo-cell-number {
   font-size: clamp(30px, 10cqi, 42px);
+}
+
+.digital-bingo-board[data-size="3"] .digital-bingo-cell {
+  min-height: 84px;
+  padding: clamp(7px, 2cqi, 10px);
 }
 
 .digital-bingo-board[data-size="3"] .digital-bingo-cell-label {
@@ -200,23 +223,47 @@
 }
 
 @container (max-width: 320px) {
-  .digital-bingo-cell {
-    padding-inline: 2px;
+  .digital-bingo-board-heading {
+    gap: 6px;
   }
 
-  .digital-bingo-cell-top {
-    gap: 1px;
-    min-height: 22px;
+  .digital-bingo-board-meta {
+    gap: 5px;
   }
 
-  .digital-bingo-cell-number {
-    padding-left: 0;
+  .digital-bingo-board[data-size="5"] .digital-bingo-cell {
+    min-height: 60px;
+    padding: 4px 2px;
+  }
+
+  .digital-bingo-board[data-size="5"] .digital-bingo-cell-number {
     font-size: 22px;
+  }
+
+  .digital-bingo-board[data-size="5"] .digital-bingo-cell-label {
+    font-size: 10px;
+    line-height: 1.15;
+  }
+}
+
+@media (hover: hover) {
+  .digital-bingo-cell:hover:not(:disabled) {
+    border-color: var(--cell-ink);
+    filter: none;
+  }
+
+  .digital-bingo-cell.is-marked:hover:not(:disabled) {
+    border-color: #646b68;
+  }
+
+  .digital-bingo-cell.is-winning:hover:not(:disabled) {
+    border-color: #123f36;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .digital-bingo-cell {
+  .digital-bingo-cell,
+  .digital-bingo-board-progress > span {
     transition: none;
   }
 }

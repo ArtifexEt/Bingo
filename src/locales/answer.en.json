@@ -1,6 +1,8 @@
 {
   "answer.title": "Your answer",
   "answer.chooseType": "What are you guessing?",
+  "answer.changeType": "Change type",
+  "answer.hideTypes": "Close type picker",
   "answer.option.band": "Band",
   "answer.option.solo": "Solo artist",
   "answer.option.yes": "Yes",

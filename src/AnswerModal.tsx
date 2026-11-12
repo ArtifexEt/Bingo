@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { Check, Eye, EyeOff, Pencil, ShieldCheck } from "lucide-react";
 import { bingoCategories, bingoColors, type BingoLevel } from "./bingo";
 import {
@@ -9,6 +9,8 @@ import {
 } from "./answer";
 import { useTranslation } from "./i18n";
 import Modal from "./Modal";
+import RoundStatus from "./RoundStatus";
+import type { BingoRound } from "./bingo-play";
 import "./answer-modal.css";
 
 type Stage = "editing" | "covered" | "revealed";
@@ -17,12 +19,16 @@ export default function AnswerModal({
   level,
   answer,
   category,
+  round,
+  now,
   onSave,
   onClose,
 }: {
   level: BingoLevel;
   answer: string;
   category: number | null;
+  round: BingoRound;
+  now: number;
   onSave: (answer: string) => void;
   onClose: () => void;
 }) {
@@ -39,9 +45,13 @@ export default function AnswerModal({
       (category !== null && category >= 0 && category < 5 ? category : null),
   );
   const [value, setValue] = useState(saved?.value ?? "");
+  const [choosingType, setChoosingType] = useState(selected === null);
+  const typesId = useId();
   const [error, setError] = useState("");
   const cover = useRef<HTMLButtonElement>(null);
   const revealed = useRef<HTMLHeadingElement>(null);
+  const entry = useRef<HTMLDivElement>(null);
+  const categories = useRef<HTMLFieldSetElement>(null);
   const year = new Date().getFullYear();
   const kind = selected === null ? null : answerKind(level, selected);
   const label = selected === null ? null : bingoCategories[level][selected];
@@ -50,6 +60,15 @@ export default function AnswerModal({
     if (stage === "covered") cover.current?.focus();
     if (stage === "revealed") revealed.current?.focus();
   }, [stage]);
+  useEffect(() => {
+    if (stage !== "editing") return;
+    const target = choosingType
+      ? (categories.current?.querySelector<HTMLElement>(
+          "button[aria-pressed='true']",
+        ) ?? categories.current?.querySelector<HTMLElement>("button"))
+      : entry.current?.querySelector<HTMLElement>("input, select, button");
+    target?.focus();
+  }, [stage, selected, choosingType]);
 
   function displayAnswer(entry: SavedAnswer) {
     if (entry.category === null) return entry.value;
@@ -65,9 +84,11 @@ export default function AnswerModal({
   }
 
   function chooseCategory(index: number) {
-    if (index === selected) return;
-    setSelected(index);
-    setValue("");
+    if (index !== selected) {
+      setSelected(index);
+      setValue("");
+    }
+    setChoosingType(false);
     setError("");
   }
 
@@ -84,8 +105,44 @@ export default function AnswerModal({
     setStage("covered");
   }
 
+  const categoryChoices = (
+    <fieldset ref={categories} className="answer-categories" id={typesId}>
+      <legend>{t("answer.chooseType")}</legend>
+      <div className="answer-category-grid">
+        {bingoCategories[level].map((item, index) => (
+          <button
+            type="button"
+            key={index}
+            className="answer-category"
+            aria-pressed={selected === index}
+            style={
+              {
+                "--answer-fill": bingoColors[index].fill,
+                "--answer-ink": bingoColors[index].ink,
+              } as CSSProperties
+            }
+            onClick={() => chooseCategory(index)}
+          >
+            <span aria-hidden="true">{index + 1}</span>
+            {item.name}
+            {selected === index && <Check size={18} aria-hidden="true" />}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+
   return (
-    <Modal title={t("answer.title")} onClose={onClose} fullscreen>
+    <Modal
+      title={t("answer.title")}
+      onClose={onClose}
+      fullscreen
+      context={
+        round.category !== null ? (
+          <RoundStatus level={level} round={round} now={now} />
+        ) : undefined
+      }
+    >
       {stage === "editing" ? (
         <form
           className="answer-editor"
@@ -94,34 +151,33 @@ export default function AnswerModal({
             save();
           }}
         >
-          <fieldset className="answer-categories">
-            <legend>{t("answer.chooseType")}</legend>
-            <div className="answer-category-grid">
-              {bingoCategories[level].map((item, index) => (
-                <button
-                  type="button"
-                  key={index}
-                  className="answer-category"
-                  aria-pressed={selected === index}
-                  style={
-                    {
-                      "--answer-fill": bingoColors[index].fill,
-                      "--answer-ink": bingoColors[index].ink,
-                    } as CSSProperties
-                  }
-                  onClick={() => chooseCategory(index)}
-                >
-                  <span aria-hidden="true">{index + 1}</span>
-                  {item.name}
-                  {selected === index && <Check size={18} aria-hidden="true" />}
-                </button>
-              ))}
+          {selected === null && categoryChoices}
+          {selected !== null && label && (
+            <div
+              className="answer-type-summary"
+              style={
+                {
+                  "--answer-fill": bingoColors[selected].fill,
+                  "--answer-ink": bingoColors[selected].ink,
+                } as CSSProperties
+              }
+            >
+              <strong>
+                <span aria-hidden="true">{selected + 1}</span>
+                {label.name}
+              </strong>
+              <button
+                type="button"
+                aria-expanded={choosingType}
+                aria-controls={typesId}
+                onClick={() => setChoosingType(!choosingType)}
+              >
+                {t(choosingType ? "answer.hideTypes" : "answer.changeType")}
+              </button>
             </div>
-          </fieldset>
+          )}
           {kind && label && (
-            <div className="answer-entry" key={selected}>
-              <h3>{label.name}</h3>
-              <p>{label.hint}</p>
+            <div ref={entry} className="answer-entry" key={selected}>
               {kind === "artistType" || kind === "before2000" ? (
                 <div
                   className="answer-options"
@@ -203,8 +259,10 @@ export default function AnswerModal({
                   )}
                 </label>
               )}
+              <p>{label.hint}</p>
             </div>
           )}
+          {selected !== null && choosingType && categoryChoices}
           {error && (
             <p className="error" role="alert">
               {error}

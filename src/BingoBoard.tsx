@@ -14,6 +14,7 @@ export type BingoBoardProps = {
   board: Pick<BingoPlayer, "seed" | "marks">;
   level: BingoLevel;
   size: BingoSize;
+  currentCategory?: number | null;
   onCell: (index: number) => void;
 };
 
@@ -21,6 +22,7 @@ export default function BingoBoard({
   board,
   level,
   size,
+  currentCategory = null,
   onCell,
 }: BingoBoardProps) {
   const { t } = useTranslation();
@@ -38,39 +40,50 @@ export default function BingoBoard({
       className={"digital-bingo-board" + (hasBingo ? " has-bingo" : "")}
       aria-labelledby={headingId}
       data-size={size}
-      style={{ "--board-size": size } as CSSProperties}
+      style={
+        {
+          "--board-size": size,
+          "--marked-progress": `${(marked.size / cells.length) * 100}%`,
+        } as CSSProperties
+      }
     >
       <header className="digital-bingo-board-heading">
         <h3 id={headingId}>{t("board.title")}</h3>
-        <span
-          className="digital-bingo-board-score"
-          role="group"
-          aria-label={t("board.markedCount", {
-            count: marked.size,
-            total: cells.length,
-          })}
-        >
-          <strong aria-hidden="true">{marked.size}</strong>
-          <span aria-hidden="true">/ {cells.length}</span>
-        </span>
+        <div className="digital-bingo-board-meta">
+          {hasBingo && (
+            <span className="digital-bingo-board-badge" aria-hidden="true">
+              Bingo!
+            </span>
+          )}
+          <span
+            className="digital-bingo-board-score"
+            role="group"
+            aria-label={t("board.markedCount", {
+              count: marked.size,
+              total: cells.length,
+            })}
+          >
+            <strong aria-hidden="true">{marked.size}</strong>
+            <span aria-hidden="true">/ {cells.length}</span>
+          </span>
+        </div>
       </header>
       <div
-        className="digital-bingo-board-status"
+        className="digital-bingo-board-status sr-only"
         role="status"
         aria-live="polite"
         aria-atomic="true"
       >
-        {hasBingo && (
-          <>
-            <strong aria-hidden="true">Bingo!</strong>
-            <span className="sr-only">{t("board.bingo")}</span>
-          </>
-        )}
+        {hasBingo ? t("board.bingo") : ""}
+      </div>
+      <div className="digital-bingo-board-progress" aria-hidden="true">
+        <span />
       </div>
       <div className="digital-bingo-grid">
         {cells.map((category, index) => {
           const isMarked = marked.has(index);
           const isWinning = winners.has(index);
+          const isCurrent = !isMarked && currentCategory === category;
           const label = bingoCategories[level][category];
           const colors = bingoColors[category];
           const cellStyle = {
@@ -84,7 +97,8 @@ export default function BingoBoard({
               className={
                 "digital-bingo-cell" +
                 (isMarked ? " is-marked" : "") +
-                (isWinning ? " is-winning" : "")
+                (isWinning ? " is-winning" : "") +
+                (isCurrent ? " is-current-category" : "")
               }
               style={cellStyle}
               aria-pressed={isMarked}
@@ -98,6 +112,7 @@ export default function BingoBoard({
               })}
               data-cell={index}
               data-category={category}
+              data-current-category={isCurrent || undefined}
               data-winning={isWinning || undefined}
               onClick={() => onCell(index)}
             >

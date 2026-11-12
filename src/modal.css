@@ -78,6 +78,19 @@
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
+.modal.app-modal .modal-context {
+  flex-shrink: 0;
+  min-width: 0;
+  background: var(--surface);
+}
+.modal.app-modal .modal-context .round-status {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+  padding-inline: max(18px, env(safe-area-inset-left, 0px))
+    max(18px, env(safe-area-inset-right, 0px));
+}
 .modal.app-modal .modal-body .modal-actions {
   gap: 12px;
 }

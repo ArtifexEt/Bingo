@@ -1,0 +1,151 @@
+.settings-panel {
+  width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.settings-panel > h2 {
+  margin-bottom: 2px;
+}
+.app-settings {
+  display: contents;
+}
+.settings-card,
+.settings-section {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.settings-section h3,
+.settings-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: #31583d;
+  font-size: 16px;
+  font-weight: 600;
+}
+.settings-section h3 > svg {
+  flex-shrink: 0;
+}
+.settings-level {
+  padding: 0;
+  margin: 0 0 16px;
+  border: 0;
+  min-width: 0;
+}
+.settings-level legend,
+.settings-field-label {
+  display: block;
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.settings-board-size {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.settings-hint {
+  color: #526454;
+  font-size: 12px;
+}
+.settings-new-game {
+  margin-top: 14px;
+}
+.settings-tools {
+  display: grid;
+  gap: 8px;
+}
+.settings-tools button {
+  justify-content: flex-start;
+  min-height: 48px;
+}
+.settings-card .play-time-setting {
+  margin-bottom: 12px;
+}
+.settings-card .play-sound {
+  min-height: 44px;
+  font-size: 12px;
+}
+.settings-nav-icon {
+  position: relative;
+  display: flex;
+}
+.settings-update-dot {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  background: #a54834;
+}
+.app-settings .language-switch {
+  display: inline-flex;
+}
+.app-settings .language-switch button {
+  min-width: 64px;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.settings-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.settings-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  max-width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #ead4a5;
+  border-radius: 10px;
+  background: #f5e5c2;
+  color: #745521;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.settings-link > svg {
+  flex-shrink: 0;
+}
+.settings-link:hover {
+  text-decoration: underline;
+}
+.app-settings .pwa-toolbar {
+  display: block;
+}
+.app-settings .pwa-version {
+  display: block;
+  margin-bottom: 10px;
+  padding-top: 0;
+  font-size: 12px;
+}
+.app-settings .pwa-actions {
+  justify-content: flex-start;
+  gap: 8px;
+}
+.app-settings .pwa-actions button {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.app-settings .pwa-check {
+  border: 1px solid #dce1d5;
+  background: var(--surface);
+}
+.app-settings .pwa-check-result {
+  margin-top: 8px;
+  text-align: left;
+  font-size: 12px;
+}

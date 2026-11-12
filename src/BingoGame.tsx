@@ -1,5 +1,5 @@
 import { displayTranslation, t, useTranslation } from "./i18n";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { CircleHelp, Download, LoaderCircle, Printer } from "lucide-react";
 import { bingoLevels, type BingoLevel, type BingoSize } from "./bingo";
 import { preparePDFPreview } from "./pdf-preview";
@@ -17,11 +17,13 @@ export default function BingoGame({
   onSheetChange,
   level,
   onLevelChange,
+  settingsContent,
 }: {
   sheet: BingoSheet;
   onSheetChange: (sheet: BingoSheet) => void;
   level: BingoLevel;
   onLevelChange: (level: BingoLevel) => void;
+  settingsContent: ReactNode;
 }) {
   useTranslation();
   const [count, setCount] = useState(4);
@@ -81,31 +83,35 @@ export default function BingoGame({
     <section className="bingo-shell" aria-labelledby="bingo-title">
       <header className="bingo-heading">
         <BingoTitle />
-        <div className="bingo-tools">
-          <button
-            className="bingo-tool"
-            type="button"
-            aria-label={t("components.BingoGame.howToPlay")}
-            aria-haspopup="dialog"
-            onClick={() => onSheetChange("help")}
-          >
-            <CircleHelp size={21} aria-hidden="true" />
-          </button>
-          <button
-            className="bingo-tool bingo-boards-entry"
-            type="button"
-            aria-haspopup="dialog"
-            onClick={() => onSheetChange("print")}
-          >
-            <Printer size={21} aria-hidden="true" />
-            <span>{t("bingoApp.boards")}</span>
-          </button>
-        </div>
       </header>
       <BingoPlay
         level={level}
         onLevelChange={onLevelChange}
         onBoardSizeChange={setPrintBoardSize}
+        settingsContent={settingsContent}
+        settingsTools={
+          <div className="settings-tools">
+            <button
+              className="secondary"
+              type="button"
+              aria-label={t("components.BingoGame.howToPlay")}
+              aria-haspopup="dialog"
+              onClick={() => onSheetChange("help")}
+            >
+              <CircleHelp size={21} aria-hidden="true" />
+              {t("components.BingoGame.howToPlay")}
+            </button>
+            <button
+              className="secondary"
+              type="button"
+              aria-haspopup="dialog"
+              onClick={() => onSheetChange("print")}
+            >
+              <Printer size={21} aria-hidden="true" />
+              <span>{t("bingoApp.boards")}</span>
+            </button>
+          </div>
+        }
       />
       {sheet === "help" && (
         <Modal

@@ -1,10 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import {
   Clock3,
+  ArrowUpRight,
   Grid3X3,
   Pause,
+  PencilLine,
   Play,
   RotateCcw,
+  Settings,
   Shuffle,
   Undo2,
 } from "lucide-react";
@@ -20,6 +30,7 @@ import { useTranslation } from "./i18n";
 import BingoBoard from "./BingoBoard";
 import BingoCelebration from "./BingoCelebration";
 import AnswerModal from "./AnswerModal";
+import RoundStatus from "./RoundStatus";
 import BoardSizeSelect from "./BoardSizeSelect";
 import Modal from "./Modal";
 import {
@@ -36,7 +47,9 @@ import {
   type BingoSession,
 } from "./bingo-play";
 import { personalSession } from "./bingo-personal";
+import { getPwaSnapshot, getServerPwaSnapshot, subscribePwa } from "./pwa";
 import "./bingo-play.css";
+import "./settings.css";
 
 const storageKey = (level: BingoLevel) => `bingo-game-${level}-v3`;
 function readGame(level: BingoLevel) {
@@ -60,12 +73,21 @@ export default function BingoPlay({
   level,
   onLevelChange,
   onBoardSizeChange,
+  settingsContent,
+  settingsTools,
 }: {
   level: BingoLevel;
   onLevelChange: (level: BingoLevel) => void;
   onBoardSizeChange: (size: BingoSize) => void;
+  settingsContent: ReactNode;
+  settingsTools: ReactNode;
 }) {
   const { t } = useTranslation();
+  const pwa = useSyncExternalStore(
+    subscribePwa,
+    getPwaSnapshot,
+    getServerPwaSnapshot,
+  );
   const [game, setGame] = useState(() => readGame(level));
   const [now, setNow] = useState(Date.now);
   const [past, setPast] = useState<BingoSession[]>([]);
@@ -75,8 +97,15 @@ export default function BingoPlay({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(true);
   const [confirmDraw, setConfirmDraw] = useState(false);
-  const [sound, setSound] = useState(false);
-  const [view, setView] = useState<"play" | "host">("play");
+  const [sound, setSound] = useState(() => {
+    try {
+      return localStorage.getItem("bingo-round-sound") === "true";
+    } catch {
+      return false;
+    }
+  });
+  const [soundSaved, setSoundSaved] = useState(true);
+  const [view, setView] = useState<"play" | "host" | "settings">("play");
   const [timeOpen, setTimeOpen] = useState(false);
   const [timeDraft, setTimeDraft] = useState("");
   const [timeError, setTimeError] = useState(false);
@@ -84,6 +113,7 @@ export default function BingoPlay({
   const celebrationCount = useRef(0);
   const finishCelebration = useCallback(() => setCelebration(null), []);
   const audio = useRef<AudioContext | null>(null);
+  const answerButton = useRef<HTMLButtonElement>(null);
   const player = game.players[0];
   const deadline = game.round.deadline;
   const categoryIndex = game.round.category;
@@ -93,6 +123,15 @@ export default function BingoPlay({
   const remaining =
     deadline === null ? game.round.remainingMs : Math.max(0, deadline - now);
   const seconds = Math.ceil(remaining / 1000);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("bingo-round-sound", String(sound));
+      setSoundSaved(true);
+    } catch {
+      setSoundSaved(false);
+    }
+  }, [sound]);
 
   useEffect(() => {
     onBoardSizeChange(game.size);
@@ -201,7 +240,14 @@ export default function BingoPlay({
         ? startTimer(game, Date.now())
         : pauseTimer(game, Date.now()),
     );
-    if (sound) void audio.current?.resume();
+    if (sound) {
+      try {
+        audio.current ??= new AudioContext();
+        void audio.current.resume();
+      } catch {
+        setSound(false);
+      }
+    }
   }
   function enableSound() {
     if (sound) setSound(false);
@@ -221,7 +267,7 @@ export default function BingoPlay({
     setTimeError(false);
     setTimeOpen(true);
   }
-  function changeView(next: "play" | "host") {
+  function changeView(next: "play" | "host" | "settings") {
     setView(next);
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -231,37 +277,14 @@ export default function BingoPlay({
       {celebration !== null && (
         <BingoCelebration key={celebration} onComplete={finishCelebration} />
       )}
-      <div className="play-topbar">
-        <fieldset className="bingo-level play-level">
-          <legend className="sr-only">
-            {t("components.BingoGame.questionLevel")}
-          </legend>
-          {Object.entries(bingoLevels).map(([value, name]) => (
-            <label className="bingo-level-option" key={value}>
-              <input
-                type="radio"
-                name="bingo-level"
-                checked={level === value}
-                onChange={() => onLevelChange(value as BingoLevel)}
-              />
-              <span>{name}</span>
-            </label>
-          ))}
-        </fieldset>
+      <div className="play-topbar" hidden={view === "settings"}>
+        <p className="play-context">
+          {bingoLevels[game.level]} · {game.size} × {game.size}
+        </p>
         <div className="play-board-tools" hidden={view !== "play"}>
           <button className="quiet" disabled={!past.length} onClick={undo}>
             <Undo2 size={17} aria-hidden="true" />
             {t("play.undo")}
-          </button>
-          <button
-            className="quiet play-new-game"
-            onClick={() => {
-              setSetupSize(game.size);
-              setSetup(true);
-            }}
-          >
-            <RotateCcw size={17} aria-hidden="true" />
-            {t("play.newGame")}
           </button>
         </div>
       </div>
@@ -280,39 +303,41 @@ export default function BingoPlay({
         aria-label={t("board.title")}
         hidden={view !== "play"}
       >
+        {category && (
+          <div className="play-board-round">
+            <RoundStatus level={game.level} round={game.round} now={now} />
+          </div>
+        )}
         <BingoBoard
           board={player}
           level={game.level}
           size={game.size}
+          currentCategory={categoryIndex}
           onCell={(index) => apply(correctCell(game, player.id, index), true)}
         />
         <div className="play-board-footer">
           <p>{t("play.personalHint")}</p>
         </div>
         <button
+          ref={answerButton}
           className="primary play-answer-button"
           aria-haspopup="dialog"
           onClick={() => setAnswerOpen(true)}
         >
+          <PencilLine size={19} aria-hidden="true" />
           {t(player.answer ? "play.savedAnswer" : "play.answer")}
         </button>
+        <p className="play-answer-hint">{t("play.answerActionHint")}</p>
       </section>
       <section
         className="play-host"
         aria-label={t("play.roundPanel")}
         hidden={view !== "host"}
       >
-        <h2>{t("play.roundPanel")}</h2>
-        <p className="play-host-hint">{t("play.hostHint")}</p>
-        <button
-          className="secondary play-time-setting"
-          onClick={editTime}
-          aria-haspopup="dialog"
-        >
-          <Clock3 size={17} aria-hidden="true" />
-          {game.roundDurationMs / 1000} {t("play.seconds")} ·{" "}
-          {t("play.editTime")}
-        </button>
+        <header className="play-panel-heading">
+          <h2>{t("play.roundPanel")}</h2>
+          <p>{t("play.hostIntro")}</p>
+        </header>
         <section className="play-round" aria-label={t("play.roundPanel")}>
           <div
             className="play-question"
@@ -369,14 +394,27 @@ export default function BingoPlay({
                   </p>
                 )}
               </div>
-              <label className="play-sound">
-                <input type="checkbox" checked={sound} onChange={enableSound} />
-                {t("play.sound")}
-              </label>
+            </div>
+          )}
+          {category && (
+            <div className="play-host-answer-area">
+              <button
+                className="primary play-host-answer"
+                onClick={() => {
+                  changeView("play");
+                  setAnswerOpen(true);
+                }}
+                aria-haspopup="dialog"
+              >
+                <PencilLine size={19} aria-hidden="true" />
+                {t("play.hostAnswer")}
+                <ArrowUpRight size={18} aria-hidden="true" />
+              </button>
+              <p>{t("play.hostAnswerHint")}</p>
             </div>
           )}
           <button
-            className="primary play-draw"
+            className={`${category ? "secondary" : "primary"} play-draw`}
             disabled={deadline !== null}
             onClick={() =>
               game.round.phase === "answering" ? setConfirmDraw(true) : draw()
@@ -388,6 +426,85 @@ export default function BingoPlay({
               : t("components.BingoGame.drawAChallenge")}
           </button>
         </section>
+      </section>
+      <section
+        className="settings-panel"
+        aria-label={t("settings.title")}
+        hidden={view !== "settings"}
+      >
+        <h2>{t("settings.title")}</h2>
+        <section
+          className="settings-card"
+          aria-labelledby="settings-game-title"
+        >
+          <h3 id="settings-game-title">{t("settings.game")}</h3>
+          <fieldset className="settings-level">
+            <legend>{t("components.BingoGame.questionLevel")}</legend>
+            <div className="bingo-level">
+              {Object.entries(bingoLevels).map(([value, name]) => (
+                <label className="bingo-level-option" key={value}>
+                  <input
+                    type="radio"
+                    name="bingo-level"
+                    checked={level === value}
+                    onChange={() => onLevelChange(value as BingoLevel)}
+                  />
+                  <span>{name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <p className="settings-board-size">
+            {t("settings.currentBoard", { size: game.size })}
+          </p>
+          <p className="settings-hint">{t("settings.newBoardHint")}</p>
+          <button
+            className="secondary settings-new-game"
+            aria-haspopup="dialog"
+            onClick={() => {
+              setSetupSize(game.size);
+              setSetup(true);
+            }}
+          >
+            <RotateCcw size={17} aria-hidden="true" />
+            {t("play.newGame")}
+          </button>
+        </section>
+        <section
+          className="settings-card"
+          aria-labelledby="settings-round-title"
+        >
+          <h3 id="settings-round-title">{t("settings.round")}</h3>
+          <span className="settings-field-label">
+            {t("settings.roundTime")}
+          </span>
+          <button
+            className="secondary play-time-setting"
+            onClick={editTime}
+            aria-haspopup="dialog"
+          >
+            <Clock3 size={17} aria-hidden="true" />
+            {game.roundDurationMs / 1000} {t("play.seconds")} ·{" "}
+            {t("play.editTime")}
+          </button>
+          <label className="play-sound">
+            <input type="checkbox" checked={sound} onChange={enableSound} />
+            {t("play.sound")}
+          </label>
+          {!soundSaved && (
+            <p className="error" role="status">
+              {t("settings.preferenceSaveFailed")}
+            </p>
+          )}
+        </section>
+        <section
+          className="settings-card"
+          aria-labelledby="settings-tools-title"
+        >
+          <h3 id="settings-tools-title">{t("settings.tools")}</h3>
+          {settingsTools}
+        </section>
+        {settingsContent}
       </section>
       <nav className="play-navigation" aria-label={t("play.navigation")}>
         <button
@@ -404,7 +521,23 @@ export default function BingoPlay({
           onClick={() => changeView("host")}
         >
           <Clock3 size={22} aria-hidden="true" />
-          <span>{t("play.roundPanel")}</span>
+          <span>{t("play.hostTab")}</span>
+        </button>
+        <button
+          type="button"
+          aria-current={view === "settings" ? "page" : undefined}
+          onClick={() => changeView("settings")}
+        >
+          <span className="settings-nav-icon">
+            <Settings size={22} aria-hidden="true" />
+            {pwa.updateReady && (
+              <span className="settings-update-dot" aria-hidden="true" />
+            )}
+          </span>
+          <span>{t("settings.title")}</span>
+          {pwa.updateReady && (
+            <span className="sr-only">{t("pwa.newVersion")}</span>
+          )}
         </button>
       </nav>
       {timeOpen && (
@@ -473,12 +606,19 @@ export default function BingoPlay({
       {answerOpen && (
         <AnswerModal
           level={game.level}
+          round={game.round}
+          now={now}
           answer={player.answer}
           category={categoryIndex}
           onSave={(answer) =>
             apply({ ...game, players: [{ ...player, answer }] })
           }
-          onClose={() => setAnswerOpen(false)}
+          onClose={() => {
+            setAnswerOpen(false);
+            requestAnimationFrame(() =>
+              answerButton.current?.focus({ preventScroll: true }),
+            );
+          }}
         />
       )}
       {setup && (
@@ -503,6 +643,7 @@ export default function BingoPlay({
                 setPast([]);
                 setSetup(false);
                 setNow(Date.now());
+                changeView("play");
               }}
             >
               {t("play.startGame")}

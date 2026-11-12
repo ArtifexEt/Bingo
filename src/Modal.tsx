@@ -39,6 +39,7 @@ function lockPage(document: Document) {
 export default function Modal({
   title,
   children,
+  context,
   onClose,
   wide = false,
   sheet = false,
@@ -46,6 +47,7 @@ export default function Modal({
 }: {
   title: string;
   children: ReactNode;
+  context?: ReactNode;
   onClose: () => void;
   wide?: boolean;
   sheet?: boolean;
@@ -141,6 +143,7 @@ export default function Modal({
           <X size={20} aria-hidden="true" />
         </button>
       </div>
+      {context && <div className="modal-context">{context}</div>}
       <div className="modal-body">{children}</div>
     </dialog>
   );

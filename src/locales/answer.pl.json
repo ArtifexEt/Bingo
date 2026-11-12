@@ -1,6 +1,8 @@
 {
   "answer.title": "Twoja odpowiedź",
   "answer.chooseType": "Co odgadujesz?",
+  "answer.changeType": "Zmień typ",
+  "answer.hideTypes": "Zamknij wybór",
   "answer.option.band": "Zespół",
   "answer.option.solo": "Solista",
   "answer.option.yes": "Tak",

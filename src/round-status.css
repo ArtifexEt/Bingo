@@ -1,0 +1,66 @@
+.round-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 16px;
+  border: 1px solid #c9d4ca;
+  border-radius: 12px;
+  background: var(--round-fill, #e0ebdf);
+  color: var(--round-ink, #31583d);
+}
+.round-status-question {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.round-status-label,
+.round-status-phase {
+  font-size: 10px;
+  line-height: 1.35;
+}
+.round-status-question > strong {
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  line-height: 1.25;
+}
+.round-status-phase {
+  font-weight: 600;
+}
+.round-status-clock {
+  display: flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  gap: 5px;
+}
+.round-status-clock > strong {
+  min-width: 1.7ch;
+  font:
+    600 42px/1 "Barlow Condensed",
+    Noto,
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.round-status-clock > span {
+  font-size: 11px;
+}
+.round-status.is-ending .round-status-clock,
+.round-status[data-state="timeUp"] .round-status-clock {
+  color: #953e2c;
+}
+.round-status[data-state="checking"] .round-status-clock {
+  opacity: 0.7;
+}
+@media (max-height: 480px) {
+  .round-status {
+    gap: 12px;
+    padding-block: 8px;
+  }
+  .round-status-clock > strong {
+    font-size: 36px;
+  }
+}

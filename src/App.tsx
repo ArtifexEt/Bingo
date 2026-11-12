@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
-import { Coffee, ExternalLink } from "lucide-react";
 import BingoGame from "./BingoGame";
-import PwaControls from "./PwaControls";
+import AppSettings from "./AppSettings";
+import { getLanguage, setLanguage, useTranslation } from "./i18n";
 import {
-  getLanguage,
-  setLanguage,
-  useTranslation,
-  type Language,
-} from "./i18n";
-import {
-  hiciarzUrl,
   levelStorageKey,
   parseRoute,
   routeHref,
@@ -25,7 +18,7 @@ function savedLevel() {
 }
 
 export default function App() {
-  const { language, t } = useTranslation();
+  const { language } = useTranslation();
   const [route, setRoute] = useState(() =>
     parseRoute(location.href, savedLevel()),
   );
@@ -72,50 +65,14 @@ export default function App() {
           onSheetChange={(sheet) => navigate({ ...route, sheet })}
           level={route.level}
           onLevelChange={(level) => navigate({ ...route, level })}
+          settingsContent={
+            <AppSettings
+              language={language}
+              onLanguageChange={(next) => navigate(route, next)}
+            />
+          }
         />
       </main>
-      <footer className="app-footer">
-        <div className="app-toolbar">
-          <div className="footer-links">
-            <a
-              className="creator-link footer-link"
-              href={hiciarzUrl("editor", language)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink size={17} aria-hidden="true" />
-              {t("shell.createCards")}
-            </a>
-            <a
-              className="support-link footer-link"
-              href="https://buymeacoffee.com/szymonrybka"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Coffee size={17} aria-hidden="true" />
-              {t("shell.buyCoffee")}
-            </a>
-          </div>
-          <div
-            className="language-switch"
-            role="group"
-            aria-label={t("shell.language")}
-          >
-            {(["pl", "en"] as const).map((value: Language) => (
-              <button
-                key={value}
-                type="button"
-                lang={value}
-                aria-pressed={language === value}
-                onClick={() => navigate(route, value)}
-              >
-                {value.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
-        <PwaControls />
-      </footer>
     </div>
   );
 }
