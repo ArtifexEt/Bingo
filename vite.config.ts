@@ -79,7 +79,7 @@ export default defineConfig({
       workbox: {
         cacheId: "music-bingo",
         // Let players finish an answer before explicitly applying a new version.
-        skipWaiting: true,
+        skipWaiting: false,
         clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,svg,png,ttf,json}"],
         maximumFileSizeToCacheInBytes: 4000000,
