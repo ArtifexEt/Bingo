@@ -1,25 +1,11 @@
 import { displayTranslation, t, useTranslation } from "./i18n";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import {
-  ArrowRight,
-  CircleHelp,
-  Grid3X3,
-  Download,
-  LoaderCircle,
-  Printer,
-  ScanLine,
-  Shuffle,
-} from "lucide-react";
-import {
-  bingoCategories,
-  bingoColors,
-  bingoLevels,
-  randomBingoCategory,
-  type BingoLevel,
-} from "./bingo";
+import { useEffect, useRef, useState } from "react";
+import { CircleHelp, Download, LoaderCircle, Printer } from "lucide-react";
+import { bingoLevels, type BingoLevel } from "./bingo";
 import { preparePDFPreview } from "./pdf-preview";
 import type { BingoBoardsPerPage } from "./bingo-pdf";
 import Modal from "./Modal";
+import BingoPlay from "./BingoPlay";
 import "./bingo.css";
 
 export type BingoSheet = "help" | "print" | null;
@@ -38,33 +24,15 @@ export default function BingoGame({
   onLevelChange: (level: BingoLevel) => void;
 }) {
   useTranslation();
-  const [selected, setSelected] = useState<number>();
-  const [draws, setDraws] = useState(0);
   const [count, setCount] = useState(4);
   const [boardsPerPage, setBoardsPerPage] = useState<BingoBoardsPerPage>(2);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const printController = useRef<AbortController | null>(null);
   useEffect(() => {
-    setSelected(undefined);
-    setDraws(0);
-  }, [level]);
-  useEffect(() => {
     if (sheet !== "print") printController.current?.abort();
   }, [sheet]);
   useEffect(() => () => printController.current?.abort(), []);
-  const category =
-    selected === undefined ? undefined : bingoCategories[level][selected];
-  const color = selected === undefined ? undefined : bingoColors[selected];
-  function draw() {
-    try {
-      setSelected(randomBingoCategory());
-      setDraws((n) => n + 1);
-      setError("");
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
   async function print(preview = false) {
     if (busy) return;
     setError("");
@@ -128,89 +96,11 @@ export default function BingoGame({
           </button>
         </div>
       </header>
-      <div className="bingo-draw-panel">
-        <fieldset className="bingo-level">
-          <legend className="sr-only">
-            {t("components.BingoGame.questionLevel")}
-          </legend>
-          {Object.entries(bingoLevels).map(([value, name]) => (
-            <label className="bingo-level-option" key={value}>
-              <input
-                type="radio"
-                name="bingo-level"
-                value={value}
-                checked={level === value}
-                onChange={() => {
-                  onLevelChange(value as BingoLevel);
-                }}
-              />
-              <span>{name}</span>
-            </label>
-          ))}
-        </fieldset>
-        <div
-          id="bingo-question"
-          className={"bingo-question" + (category ? " selected" : " is-empty")}
-          style={
-            color
-              ? ({
-                  "--question-fill": color.fill,
-                  "--question-ink": color.ink,
-                } as CSSProperties)
-              : undefined
-          }
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {category ? (
-            <>
-              <span className="bingo-category-number">
-                {t("components.BingoGame.draw")} {draws}{" "}
-                {t("components.BingoGame.category")} {selected! + 1}
-              </span>
-              <h2>{category.name}</h2>
-              <p>{category.hint}</p>
-            </>
-          ) : (
-            <>
-              <Grid3X3
-                className="bingo-empty-symbol"
-                size={40}
-                strokeWidth={1.4}
-                aria-hidden="true"
-              />
-              <h2>{t("bingoApp.emptyQuestion")}</h2>
-            </>
-          )}
-        </div>
-        <div className="bingo-game-actions">
-          <button
-            className="primary bingo-draw-button"
-            aria-controls="bingo-question"
-            onClick={draw}
-          >
-            <Shuffle size={21} aria-hidden="true" />
-            {category
-              ? t("components.BingoGame.drawAnotherChallenge")
-              : t("components.BingoGame.drawAChallenge")}
-          </button>
-          <a
-            className="bingo-scanner-link"
-            href={scannerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ScanLine size={19} aria-hidden="true" /> {t("bingoApp.scanCard")}{" "}
-            <ArrowRight size={18} aria-hidden="true" />
-          </a>
-          {error && !sheet && (
-            <p className="error" role="alert">
-              {displayTranslation(error)}
-            </p>
-          )}
-        </div>
-      </div>
+      <BingoPlay
+        level={level}
+        onLevelChange={onLevelChange}
+        scannerUrl={scannerUrl}
+      />
       {sheet === "help" && (
         <Modal
           title={t("components.BingoGame.howToPlay")}
@@ -220,6 +110,16 @@ export default function BingoGame({
           <div className="bingo-help">
             <p>{t("components.BingoGame.drawACategoryAndScanA")}</p>
             <p>{t("components.BingoGame.atBeginnerLevelGuessingTheExact")}</p>
+            <p>{t("play.helpDigital")}</p>
+            <p>{t("play.helpTie")}</p>
+            <a
+              className="bingo-rules-link"
+              href="https://hitstergame.com/pl-pl/pages/zasady-gry-bingo"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("play.officialRules")}
+            </a>
           </div>
         </Modal>
       )}

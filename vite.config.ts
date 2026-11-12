@@ -18,7 +18,7 @@ export default defineConfig({
         start_url: base,
         scope: base,
         description:
-          "Muzyczne Bingo. Losowanie kategorii i plansze PDF do druku.",
+          "Muzyczne Bingo. Cyfrowe plansze, timer, rundy i plansze PDF do druku.",
         lang: "pl",
         dir: "ltr",
         categories: ["games", "music"],

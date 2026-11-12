@@ -1,0 +1,10 @@
+{
+  "board.markedCount": "Marked cells: {{count}} of 25",
+  "board.bingo": "Bingo! {{name}} has a complete line.",
+  "board.cell": "Row {{row}}, column {{column}}. Category {{category}}: {{name}}. {{state}}. {{action}}.",
+  "board.marked": "Marked",
+  "board.unmarked": "Unmarked",
+  "board.action.mark": "Mark this cell",
+  "board.action.erase": "Erase this mark",
+  "board.action.correct": "Toggle this mark"
+}

@@ -1,0 +1,505 @@
+.bingo-play {
+  min-width: 0;
+}
+.bingo-app .bingo-shell {
+  max-width: 1120px;
+  min-height: 0;
+}
+.bingo-app .app-toolbar {
+  max-width: 1120px;
+}
+.play-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.play-view-switch {
+  display: flex;
+  padding: 4px;
+  gap: 3px;
+  background: #e6eae3;
+  border-radius: 12px;
+}
+.play-view-switch button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  background: transparent;
+  color: #53614c;
+  font-weight: 600;
+}
+.play-view-switch button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--accent-ink);
+  box-shadow: 0 1px 3px #123f3614;
+}
+.play-new-game {
+  flex-shrink: 0;
+  color: #526454;
+}
+.play-level {
+  max-width: 420px;
+  margin-bottom: 22px;
+}
+.play-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 5vw, 64px);
+}
+.play-layout.is-personal {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 540px;
+  margin-inline: auto;
+}
+.play-round {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+  position: sticky;
+  top: 20px;
+}
+.play-question {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px;
+  border-radius: 22px;
+  background: #123f36;
+  color: #f7f4e9;
+}
+.play-round-label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.play-question h2 {
+  font:
+    600 clamp(30px, 3.7vw, 44px) / 1.08 "Barlow Condensed",
+    Noto,
+    sans-serif;
+  letter-spacing: -0.4px;
+  text-wrap: balance;
+}
+.play-question p {
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.play-timer-panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 20px;
+  align-items: center;
+  padding: 4px 8px;
+}
+.play-clock {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: #123f36;
+}
+.play-clock span {
+  font:
+    600 64px/1 "Barlow Condensed",
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  min-width: 1.7ch;
+}
+.play-clock small {
+  font-size: 12px;
+  color: #526454;
+}
+.play-clock.is-ending {
+  color: #a54834;
+}
+.play-timer-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+.play-timer-actions .quiet {
+  padding: 8px;
+  font-size: 12px;
+}
+.play-sound {
+  grid-column: 1/-1;
+  flex-direction: row;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
+  margin: 0;
+  color: #526454;
+  font-size: 12px;
+  min-height: 32px;
+  font-weight: 400;
+}
+.play-sound input {
+  accent-color: #123f36;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.play-checking {
+  color: #31583d;
+  font-weight: 600;
+  font-size: 13px;
+}
+.play-draw {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 12px;
+}
+.play-round .bingo-scanner-link {
+  font-size: 13px;
+}
+.play-board-panel {
+  min-width: 0;
+  max-width: 540px;
+  width: 100%;
+  justify-self: center;
+}
+.play-player-tools {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.play-player-select {
+  flex: 1;
+  min-width: 0;
+  max-width: 300px;
+  margin: 0;
+  gap: 5px;
+  color: #526454;
+}
+.play-player-select select {
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.play-player-tools > button {
+  flex-shrink: 0;
+  padding-inline: 10px;
+}
+.play-board-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 480px;
+  margin: 10px auto 14px;
+}
+.play-board-footer p {
+  font-size: 12px;
+  color: #526454;
+  line-height: 1.5;
+}
+.play-board-footer .quiet {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 8px;
+}
+.play-board-footer .quiet[aria-pressed="true"] {
+  color: #123f36;
+  background: #e0ebdf;
+}
+.play-answer {
+  display: flex;
+  gap: 6px;
+  max-width: 480px;
+  margin: 0 auto;
+  color: #526454;
+}
+.play-answer input,
+.play-setup input[type="text"] {
+  width: 100%;
+  border: 1px solid #dedfd8;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px 14px;
+  min-height: 46px;
+  font-size: 16px;
+  font-weight: 400;
+}
+.play-answer input:disabled {
+  background: #eeefea;
+  opacity: 1;
+  color: #526454;
+}
+.play-answer input::placeholder {
+  color: #73796f;
+}
+.play-bonus,
+.play-resolve {
+  display: flex;
+  width: 100%;
+  max-width: 480px;
+  margin: 14px auto 0;
+}
+.play-mode-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f5e5c2;
+  color: #745521;
+  padding: 10px 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.play-mode-note span {
+  flex: 1;
+}
+.play-mode-note .quiet {
+  color: inherit;
+  padding: 6px;
+}
+.play-tie-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.play-winner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 18px;
+  margin-top: 18px;
+  border: 1px solid #b7cc99;
+  border-radius: 14px;
+  background: #e8f1df;
+  color: #253314;
+}
+.play-winner > div {
+  flex: 1;
+  min-width: 150px;
+  overflow-wrap: anywhere;
+}
+.play-winner strong {
+  font-size: 16px;
+}
+.play-winner p {
+  margin-top: 6px;
+  font-size: 12px;
+}
+.play-setup {
+  display: grid;
+  gap: 18px;
+}
+.play-setup label {
+  margin: 0;
+}
+.play-setup > label {
+  max-width: 220px;
+}
+.play-names {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.play-setup p {
+  color: #526454;
+  font-size: 13px;
+}
+.play-setup .play-reset-note {
+  color: #a54834;
+}
+.play-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.play-setup .play-setup-actions {
+  margin-top: 0;
+}
+.bingo-rules-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 16px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+@media (min-width: 761px) and (max-width: 980px) {
+  .bingo-app .app-toolbar,
+  .bingo-app .bingo-shell {
+    max-width: 960px;
+  }
+  .bingo-shell .bingo-heading {
+    display: flex;
+    margin-block: 14px 18px;
+  }
+  .bingo-shell .bingo-tools {
+    display: flex;
+  }
+  .bingo-shell .bingo-tool.bingo-boards-entry {
+    background: transparent;
+  }
+  .play-layout {
+    gap: 26px;
+    grid-template-columns: minmax(250px, 0.85fr) minmax(0, 1fr);
+  }
+  .play-question {
+    padding: 24px;
+  }
+  .play-timer-panel {
+    gap: 8px 10px;
+    padding-inline: 0;
+  }
+}
+@media (max-width: 760px) {
+  .bingo-app .bingo-shell,
+  .bingo-app .app-toolbar {
+    max-width: 600px;
+  }
+  .bingo-shell .bingo-heading {
+    display: flex;
+    min-height: 44px;
+    margin-block: 8px 14px;
+  }
+  .bingo-shell .bingo-tools {
+    display: flex;
+  }
+  .bingo-shell .bingo-tool.bingo-boards-entry {
+    background: transparent;
+    padding-inline: 8px;
+  }
+  .play-topbar {
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .play-view-switch {
+    flex: 1;
+  }
+  .play-view-switch button {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+  }
+  .play-new-game {
+    font-size: 12px;
+    padding: 8px;
+  }
+  .play-new-game svg {
+    display: none;
+  }
+  .play-level {
+    max-width: none;
+    margin-bottom: 18px;
+  }
+  .play-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .play-round {
+    position: static;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(130px, 0.72fr);
+    gap: 10px 12px;
+  }
+  .play-question {
+    min-height: 180px;
+    padding: 20px;
+  }
+  .play-question h2 {
+    font-size: 32px;
+  }
+  .play-question p {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .play-round-label {
+    font-size: 11px;
+    margin-bottom: 12px;
+  }
+  .play-timer-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 0;
+  }
+  .play-clock span {
+    font-size: 54px;
+  }
+  .play-timer-actions {
+    width: 100%;
+  }
+  .play-timer-actions button {
+    padding: 9px;
+    font-size: 12px;
+  }
+  .play-sound {
+    font-size: 10px;
+  }
+  .play-round:not(:has(.play-timer-panel)) .play-question {
+    grid-column: 1/-1;
+    min-height: 150px;
+  }
+  .play-draw {
+    grid-column: 1/-1;
+  }
+  .play-round .bingo-scanner-link {
+    grid-column: 1/-1;
+    min-height: 40px;
+    padding-block: 6px;
+  }
+  .play-player-tools {
+    margin-bottom: 14px;
+  }
+  .play-board-footer {
+    align-items: start;
+    margin-top: 12px;
+  }
+  .play-board-footer .quiet {
+    padding-top: 0;
+    min-height: 36px;
+  }
+  .play-names {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 360px) {
+  .bingo-heading h1 {
+    font-size: 24px;
+  }
+  .bingo-tool.bingo-boards-entry {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .play-view-switch button {
+    font-size: 11px;
+  }
+  .play-view-switch button svg {
+    display: none;
+  }
+  .play-new-game {
+    padding-inline: 4px;
+    font-size: 11px;
+  }
+  .play-round {
+    grid-template-columns: minmax(0, 1fr) minmax(115px, 0.65fr);
+    gap: 10px;
+  }
+  .play-question {
+    padding: 15px;
+  }
+  .play-question h2 {
+    font-size: 29px;
+  }
+}

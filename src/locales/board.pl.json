@@ -1,0 +1,10 @@
+{
+  "board.markedCount": "Zaznaczone pola: {{count}} z 25",
+  "board.bingo": "Bingo! {{name}} ma pełną linię.",
+  "board.cell": "Wiersz {{row}}, kolumna {{column}}. Kategoria {{category}}: {{name}}. {{state}}. {{action}}.",
+  "board.marked": "Zaznaczone",
+  "board.unmarked": "Niezaznaczone",
+  "board.action.mark": "Zaznacz pole",
+  "board.action.erase": "Usuń zaznaczenie",
+  "board.action.correct": "Zmień zaznaczenie"
+}
