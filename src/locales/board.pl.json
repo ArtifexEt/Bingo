@@ -1,5 +1,7 @@
 {
-  "board.markedCount": "Zaznaczone pola: {{count}} z 25",
+  "board.markedCount": "Zaznaczone pola: {{count}} z {{total}}",
+  "board.size": "Rozmiar planszy",
+  "board.sizeOption": "{{size}} × {{size}} · {{total}} pól",
   "board.title": "Twoja plansza",
   "board.bingo": "Bingo! Masz pełną linię.",
   "board.cell": "Wiersz {{row}}, kolumna {{column}}. Kategoria {{category}}: {{name}}. {{state}}. {{action}}.",

@@ -1,4 +1,9 @@
-import { bingoBoard, type BingoLevel } from "./bingo";
+import {
+  bingoBoard,
+  isBingoSize,
+  type BingoLevel,
+  type BingoSize,
+} from "./bingo";
 
 export const BINGO_ROUND_MS = 25_000;
 export const MAX_BINGO_PLAYERS = 12;
@@ -29,6 +34,7 @@ export interface BingoSession {
   version: 1;
   id: string;
   level: BingoLevel;
+  size: BingoSize;
   players: BingoPlayer[];
   activePlayerId: string;
   round: BingoRound;
@@ -36,8 +42,8 @@ export interface BingoSession {
   winnerId: string | null;
 }
 
-const isCell = (value: number) =>
-  Number.isInteger(value) && value >= 0 && value < 25;
+const isCell = (value: number, size: BingoSize) =>
+  Number.isInteger(value) && value >= 0 && value < size * size;
 const isCategory = (value: number) =>
   Number.isInteger(value) && value >= 0 && value < 5;
 const isTime = (value: number) => Number.isSafeInteger(value) && value >= 0;
@@ -76,9 +82,11 @@ export function createSession(
   level: BingoLevel,
   names: string[],
   seed?: string,
+  size: BingoSize = 5,
 ): BingoSession {
   if (level !== "beginner" && level !== "expert")
     throw new Error("Invalid Bingo level");
+  if (!isBingoSize(size)) throw new Error("Invalid Bingo size");
   const baseSeed =
     (seed ?? generatedSeed())
       .replace(/[\u0000-\u001f\u007f]/g, " ")
@@ -102,6 +110,7 @@ export function createSession(
     version: 1,
     id: sessionId(baseSeed),
     level,
+    size,
     players,
     activePlayerId: players[0].id,
     round: readyRound(0),
@@ -216,7 +225,7 @@ export function markCell(
     session.winnerId ||
     session.tieBreak ||
     session.round.phase !== "checking" ||
-    !isCell(index) ||
+    !isCell(index, session.size) ||
     session.round.scored.includes(playerId)
   )
     return session;
@@ -224,7 +233,7 @@ export function markCell(
   if (
     !player ||
     player.marks.includes(index) ||
-    bingoBoard(player.seed)[index] !== session.round.category
+    bingoBoard(player.seed, session.size)[index] !== session.round.category
   )
     return session;
   return {
@@ -255,11 +264,11 @@ export function scoreFullCategory(
     return session;
   const player = session.players.find((entry) => entry.id === playerId);
   if (!player) return session;
-  const cells = bingoBoard(player.seed).flatMap((category, index) =>
-    category === round.category ? [index] : [],
+  const cells = bingoBoard(player.seed, session.size).flatMap(
+    (category, index) => (category === round.category ? [index] : []),
   );
   if (
-    cells.length !== 5 ||
+    cells.length === 0 ||
     !cells.every((index) => player.marks.includes(index))
   )
     return session;
@@ -284,7 +293,7 @@ export function eraseCell(
     !session.round.scored.includes(actorId) ||
     session.round.bonusUsed.includes(actorId) ||
     actorId === targetId ||
-    !isCell(index)
+    !isCell(index, session.size)
   )
     return session;
   const target = session.players.find((entry) => entry.id === targetId);
@@ -309,7 +318,7 @@ export function correctCell(
   playerId: string,
   index: number,
 ): BingoSession {
-  if (session.winnerId || !isCell(index)) return session;
+  if (session.winnerId || !isCell(index, session.size)) return session;
   const player = session.players.find((entry) => entry.id === playerId);
   if (!player) return session;
   const marks = player.marks.includes(index)
@@ -323,21 +332,26 @@ export function correctCell(
   };
 }
 
-export function winningLines(marks: number[]): number[][] {
-  const selected = new Set(marks.filter(isCell));
+export function winningLines(marks: number[], size: BingoSize = 5): number[][] {
+  const selected = new Set(marks.filter((mark) => isCell(mark, size)));
   const lines: number[][] = [];
-  for (let row = 0; row < 5; row++)
-    lines.push(Array.from({ length: 5 }, (_, column) => row * 5 + column));
-  for (let column = 0; column < 5; column++)
-    lines.push(Array.from({ length: 5 }, (_, row) => row * 5 + column));
-  lines.push([0, 6, 12, 18, 24], [4, 8, 12, 16, 20]);
+  for (let row = 0; row < size; row++)
+    lines.push(
+      Array.from({ length: size }, (_, column) => row * size + column),
+    );
+  for (let column = 0; column < size; column++)
+    lines.push(Array.from({ length: size }, (_, row) => row * size + column));
+  lines.push(
+    Array.from({ length: size }, (_, index) => index * (size + 1)),
+    Array.from({ length: size }, (_, index) => (index + 1) * (size - 1)),
+  );
   return lines.filter((line) => line.every((index) => selected.has(index)));
 }
 
 export function startTieBreak(session: BingoSession): BingoSession {
   if (session.winnerId || session.tieBreak) return session;
   const contenders = session.players
-    .filter((player) => winningLines(player.marks).length > 0)
+    .filter((player) => winningLines(player.marks, session.size).length > 0)
     .map((player) => player.id);
   if (contenders.length < 2) return session;
   return {
@@ -440,7 +454,7 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
   try {
     const value: unknown = JSON.parse(raw);
     if (
-      !record(value, [
+      (!record(value, [
         "version",
         "id",
         "level",
@@ -449,7 +463,18 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
         "round",
         "tieBreak",
         "winnerId",
-      ]) ||
+      ]) &&
+        !record(value, [
+          "version",
+          "id",
+          "level",
+          "size",
+          "players",
+          "activePlayerId",
+          "round",
+          "tieBreak",
+          "winnerId",
+        ])) ||
       value.version !== 1 ||
       !text(value.id, 160) ||
       (value.level !== "beginner" && value.level !== "expert") ||
@@ -458,6 +483,8 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
       value.players.length > MAX_BINGO_PLAYERS
     )
       return null;
+    const size = Object.hasOwn(value, "size") ? value.size : 5;
+    if (!isBingoSize(size)) return null;
     const players: BingoPlayer[] = [];
     for (const player of value.players) {
       if (
@@ -468,9 +495,11 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
         !text(player.seed, MAX_SEED_LENGTH) ||
         !text(player.answer, MAX_ANSWER_LENGTH, true) ||
         !Array.isArray(player.marks) ||
-        player.marks.length > 25 ||
+        player.marks.length > size * size ||
         new Set(player.marks).size !== player.marks.length ||
-        !player.marks.every((mark) => typeof mark === "number" && isCell(mark))
+        !player.marks.every(
+          (mark) => typeof mark === "number" && isCell(mark, size),
+        )
       )
         return null;
       players.push({
@@ -581,6 +610,7 @@ export function parseStoredSession(raw: string | null): BingoSession | null {
       version: 1,
       id: value.id,
       level: value.level,
+      size,
       players,
       activePlayerId: value.activePlayerId,
       round: {

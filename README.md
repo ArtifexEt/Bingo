@@ -6,18 +6,18 @@ Graj na cyfrowych planszach, prowadź rundy muzycznego Bingo i przygotuj plansze
 
 ## Korzystanie
 
-1. Każdy otwiera Bingo na własnym telefonie. Wybierz poziom: **Na dobry początek** lub **Dla znawców**. Każdy poziom zachowuje osobną planszę.
+1. Każdy otwiera Bingo na własnym telefonie. Wybierz poziom: **Na dobry początek** lub **Dla znawców**. W **Nowej grze** wybierz rozmiar **3 × 3, 4 × 4 lub 5 × 5**. Każdy poziom zachowuje osobną planszę wraz z jej rozmiarem.
 2. Dotknij pola, aby je **wyszarzyć i przekreślić dużym iksem**; ponowne dotknięcie usuwa zaznaczenie. **Cofnij** odwraca ostatni ruch. **Nowa gra** tworzy nowy układ po potwierdzeniu.
 3. Przycisk **Twoja odpowiedź** otwiera modal na cały ekran. Wybierz typ odpowiedzi i wpisz lub wybierz wartość. Po zatwierdzeniu odpowiedź jest zakryta; dotknij osłony, aby ją odsłonić. Możesz ponownie ją ukryć albo przygotować nową odpowiedź.
 4. Prowadzący może rozwinąć **Prowadzenie rundy**, wylosować kategorię, uruchomić muzykę skanerem i nacisnąć **Start 25 s**. Timer można wstrzymać; powrót z aplikacji muzycznej lub odświeżenie strony nie dodaje czasu.
 5. Po odsłonięciu karty sprawdźcie odpowiedzi. Poprawna odpowiedź pozwala zaznaczyć jedno wolne pole wylosowanej kategorii. Bonusy i dogrywki rozliczacie wspólnie, a każdy zmienia zaznaczenia na własnym telefonie.
-6. Pięć pól w rzędzie, kolumnie lub na przekątnej daje **Bingo** i uruchamia konfetti oraz fajerwerki. Efekt trwa 7 sekund, nie blokuje planszy i respektuje systemową opcję ograniczenia ruchu.
+6. Pełny rząd, kolumna lub przekątna daje **Bingo** i uruchamia konfetti oraz fajerwerki: potrzeba odpowiednio 3, 4 lub 5 zaznaczonych pól. Efekt trwa 7 sekund, nie blokuje planszy i respektuje systemową opcję ograniczenia ruchu.
 
 Każde urządzenie ma jedną własną planszę, bez nazw i wyboru gracza. Postępy nie są synchronizowane między urządzeniami. Aktualizacja starej gry zachowuje aktywną planszę i jej zaznaczenia.
 
 Układy, zaznaczenia, odpowiedzi i timer są zapisywane lokalnie w przeglądarce. Zmiana języka, obrót ekranu i odświeżenie zachowują planszę. Zapis nie jest kopią zapasową: wyczyszczenie danych witryny usuwa postępy. Po pierwszym załadowaniu aplikacja działa również offline; odtwarzanie muzyki pozostaje w osobnym skanerze.
 
-**Drukuj plansze**: wybierz od 1 do 24 plansz oraz 1, 2 lub 4 plansze na stronie A4. Pobierz PDF albo otwórz podgląd do drukowania. Drukuj jednostronnie w skali 100%; układy z kilkoma planszami zawierają linie cięcia. Cyfrowe i drukowane plansze mają siatkę 5 × 5, bez darmowego środkowego pola. Generator PDF przygotowuje nowe układy, a nie kopię aktualnej cyfrowej rozgrywki.
+**Drukuj plansze**: wybierz rozmiar **3 × 3, 4 × 4 lub 5 × 5**, od 1 do 24 plansz oraz 1, 2 lub 4 plansze na stronie A4. Pobierz PDF albo otwórz podgląd do drukowania. Drukuj jednostronnie w skali 100%; układy z kilkoma planszami zawierają linie cięcia. Cyfrowe i drukowane plansze nie mają darmowego środkowego pola. Mniejsze siatki zachowują równomierny podział pięciu kategorii; stare plansze 5 × 5 zachowują swój układ i zaznaczenia. Generator PDF przygotowuje nowe układy, a nie kopię aktualnej cyfrowej rozgrywki.
 
 Aplikacja ma polską i angielską wersję interfejsu i wydruków. Losowanie jest niezależne w każdej turze. [Zasady Hitster Bingo u wydawcy](https://hitstergame.com/pl-pl/pages/zasady-gry-bingo) są punktem odniesienia; odpowiedzi oceniają gracze na podstawie karty, nie automatyczne porównywanie tekstu.
 

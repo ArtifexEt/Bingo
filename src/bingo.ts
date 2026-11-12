@@ -1,5 +1,10 @@
 import { t as translate, localizedRecord } from "./i18n";
 export type BingoLevel = "beginner" | "expert";
+export const bingoSizes = [3, 4, 5] as const;
+export type BingoSize = (typeof bingoSizes)[number];
+export function isBingoSize(value: unknown): value is BingoSize {
+  return value === 3 || value === 4 || value === 5;
+}
 export const bingoLevels = localizedRecord(
   ["beginner", "expert"] as const,
   "bingo.levels.",
@@ -135,17 +140,32 @@ export function randomBingoCategory(
     throw new Error(translate("bingo.randomFailed"));
   return Math.floor(value * 5);
 }
-/** Each paper board has five cells of each category, in a reproducible shuffled layout. */
-export function bingoBoard(seed: string): number[] {
+/** Reproducible layouts keep all five categories balanced, including smaller boards. */
+export function bingoBoard(seed: string, size: BingoSize = 5): number[] {
+  if (!isBingoSize(size)) throw new Error("Invalid Bingo size");
   let state = 2166136261;
   for (const c of seed)
     state = Math.imul(state ^ c.charCodeAt(0), 16777619) >>> 0;
-  const cells = Array.from({ length: 25 }, (_, i) => i % 5);
-  for (let i = 24; i > 0; i--) {
+  const randomIndex = (length: number) => {
     state += 0x6d2b79f5;
     let t = Math.imul(state ^ (state >>> 15), 1 | state);
     t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    const j = Math.floor((((t ^ (t >>> 14)) >>> 0) / 4294967296) * (i + 1));
+    return Math.floor((((t ^ (t >>> 14)) >>> 0) / 4294967296) * length);
+  };
+  const categories = [0, 1, 2, 3, 4];
+  // Leave the legacy 5×5 shuffle untouched so saved seeds retain their layouts.
+  // Smaller boards choose which categories get the extra cells from their seed.
+  if (size !== 5)
+    for (let i = categories.length - 1; i > 0; i--) {
+      const j = randomIndex(i + 1);
+      [categories[i], categories[j]] = [categories[j], categories[i]];
+    }
+  const cells = Array.from(
+    { length: size * size },
+    (_, i) => categories[i % 5],
+  );
+  for (let i = cells.length - 1; i > 0; i--) {
+    const j = randomIndex(i + 1);
     [cells[i], cells[j]] = [cells[j], cells[i]];
   }
   return cells;

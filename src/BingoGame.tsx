@@ -1,12 +1,13 @@
 import { displayTranslation, t, useTranslation } from "./i18n";
 import { useEffect, useRef, useState } from "react";
 import { CircleHelp, Download, LoaderCircle, Printer } from "lucide-react";
-import { bingoLevels, type BingoLevel } from "./bingo";
+import { bingoLevels, type BingoLevel, type BingoSize } from "./bingo";
 import { preparePDFPreview } from "./pdf-preview";
 import type { BingoBoardsPerPage } from "./bingo-pdf";
 import Modal from "./Modal";
 import BingoPlay from "./BingoPlay";
 import BingoTitle from "./BingoTitle";
+import BoardSizeSelect from "./BoardSizeSelect";
 import "./bingo.css";
 
 export type BingoSheet = "help" | "print" | null;
@@ -27,6 +28,7 @@ export default function BingoGame({
   useTranslation();
   const [count, setCount] = useState(4);
   const [boardsPerPage, setBoardsPerPage] = useState<BingoBoardsPerPage>(2);
+  const [printBoardSize, setPrintBoardSize] = useState<BingoSize>(5);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const printController = useRef<AbortController | null>(null);
@@ -49,6 +51,7 @@ export default function BingoGame({
       const { buildBingoPDF } = await import("./bingo-pdf");
       const doc = await buildBingoPDF(level, count, crypto.randomUUID(), {
         boardsPerPage,
+        boardSize: printBoardSize,
         signal: controller.signal,
         onProgress: (completed) =>
           viewer?.update({
@@ -100,6 +103,7 @@ export default function BingoGame({
       <BingoPlay
         level={level}
         onLevelChange={onLevelChange}
+        onBoardSizeChange={setPrintBoardSize}
         scannerUrl={scannerUrl}
       />
       {sheet === "help" && (
@@ -132,6 +136,11 @@ export default function BingoGame({
         >
           <div className="bingo-print">
             <div className="bingo-print-row">
+              <BoardSizeSelect
+                value={printBoardSize}
+                onChange={setPrintBoardSize}
+                disabled={busy}
+              />
               <label>
                 {t("components.BingoGame.numberOfBoards")}
                 <input

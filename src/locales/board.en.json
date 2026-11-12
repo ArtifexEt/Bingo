@@ -1,5 +1,7 @@
 {
-  "board.markedCount": "Marked cells: {{count}} of 25",
+  "board.markedCount": "Marked cells: {{count}} of {{total}}",
+  "board.size": "Board size",
+  "board.sizeOption": "{{size}} × {{size}} · {{total}} squares",
   "board.title": "Your board",
   "board.bingo": "Bingo! You have a complete line.",
   "board.cell": "Row {{row}}, column {{column}}. Category {{category}}: {{name}}. {{state}}. {{action}}.",

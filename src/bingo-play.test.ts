@@ -28,7 +28,7 @@ const checking = (
   level: "beginner" | "expert" = "beginner",
 ) => finishRound(drawRound(session(level), category));
 const matchingCells = (game: BingoSession, player = 0) =>
-  bingoBoard(game.players[player].seed).flatMap((category, index) =>
+  bingoBoard(game.players[player].seed, game.size).flatMap((category, index) =>
     category === game.round.category ? [index] : [],
   );
 
@@ -532,5 +532,159 @@ describe("stored session validation", () => {
         }),
       ),
     ).toBeNull();
+  });
+});
+
+describe("different board sizes", () => {
+  it.each([3, 4] as const)(
+    "preserves size %s, marks, answers and timing through a saved round",
+    (size) => {
+      const initial = createSession("expert", ["Ada"], `sized-${size}`, size);
+      const id = initial.players[0].id;
+      expect(initial.size).toBe(size);
+      let game = correctCell(initial, id, size * size - 1);
+      game = setAnswer(drawRound(game, 0), id, "Saved answer");
+      game = startTimer(game, 1000);
+      const restored = parseStoredSession(JSON.stringify(game));
+      expect(restored).toEqual(game);
+      expect(restored!.players[0].marks).toEqual([size * size - 1]);
+      expect(restored!.players[0].answer).toBe("Saved answer");
+      expect(restored!.round.deadline).toBe(26_000);
+      expect(parseStoredSession(JSON.stringify(finishRound(game)))).toEqual(
+        finishRound(game),
+      );
+    },
+  );
+
+  it.each([3, 4] as const)(
+    "marks and scores the actual category cells of size %s without requiring five cells",
+    (size) => {
+      const initial = createSession(
+        "beginner",
+        ["Ada", "Bartek"],
+        `score-${size}`,
+        size,
+      );
+      let game = finishRound(drawRound(initial, 2));
+      const [actor, opponent] = game.players;
+      const cells = matchingCells(game);
+      expect(cells.length).toBeGreaterThan(0);
+      expect(cells.length).toBeLessThan(5);
+      const wrong = bingoBoard(actor.seed, size).findIndex(
+        (category) => category !== 2,
+      );
+      expect(markCell(game, actor.id, wrong)).toBe(game);
+      game = markCell(game, actor.id, cells[0]);
+      expect(game.players[0].marks).toEqual([cells[0]]);
+      expect(game.round.scored).toEqual([actor.id]);
+      expect(markCell(game, actor.id, cells.at(-1)!)).toBe(game);
+
+      // A fresh round can acknowledge the correct answer after this small category fills.
+      game = finishRound(drawRound(initial, 2));
+      for (const cell of cells.slice(0, -1))
+        game = correctCell(game, actor.id, cell);
+      expect(scoreFullCategory(game, actor.id)).toBe(game);
+      for (const cell of cells)
+        if (!game.players[0].marks.includes(cell))
+          game = correctCell(game, actor.id, cell);
+      game = correctCell(game, opponent.id, size * size - 1);
+      game = scoreFullCategory(game, actor.id);
+      expect(game.round.scored).toEqual([actor.id]);
+      game = eraseCell(game, actor.id, opponent.id, size * size - 1);
+      expect(game.players[1].marks).toEqual([]);
+      expect(game.round.bonusUsed).toEqual([actor.id]);
+      expect(parseStoredSession(JSON.stringify(game))).toEqual(game);
+    },
+  );
+
+  it.each([3, 4] as const)(
+    "rejects cells outside size %s in scoring, correction and stored marks",
+    (size) => {
+      const game = finishRound(
+        drawRound(createSession("beginner", ["Ada"], "bounds", size), 0),
+      );
+      const id = game.players[0].id;
+      for (const index of [-1, size * size, 24, 25, 1.5, NaN]) {
+        expect(correctCell(game, id, index)).toBe(game);
+        expect(markCell(game, id, index)).toBe(game);
+      }
+      for (const index of [size * size, 24]) {
+        const invalid = structuredClone(game);
+        invalid.players[0].marks = [index];
+        expect(parseStoredSession(JSON.stringify(invalid))).toBeNull();
+      }
+    },
+  );
+
+  it("uses three cells per row, column or diagonal on a 3×3 board", () => {
+    expect(winningLines([0, 1, 2], 3)).toEqual([[0, 1, 2]]);
+    expect(winningLines([1, 4, 7], 3)).toEqual([[1, 4, 7]]);
+    expect(winningLines([0, 4, 8], 3)).toEqual([[0, 4, 8]]);
+    expect(winningLines([2, 4, 6], 3)).toEqual([[2, 4, 6]]);
+    expect(winningLines([2, 3, 4], 3)).toEqual([]);
+    expect(winningLines([0, 1, 1], 3)).toEqual([]);
+    expect(winningLines([0, 6, 12, 18, 24], 3)).toEqual([]);
+    expect(
+      winningLines(
+        Array.from({ length: 9 }, (_, index) => index),
+        3,
+      ),
+    ).toHaveLength(8);
+  });
+
+  it("uses four cells per row, column or diagonal on a 4×4 board", () => {
+    expect(winningLines([8, 9, 10, 11], 4)).toEqual([[8, 9, 10, 11]]);
+    expect(winningLines([2, 6, 10, 14], 4)).toEqual([[2, 6, 10, 14]]);
+    expect(winningLines([0, 5, 10, 15], 4)).toEqual([[0, 5, 10, 15]]);
+    expect(winningLines([3, 6, 9, 12], 4)).toEqual([[3, 6, 9, 12]]);
+    expect(winningLines([0, 5, 10, 14], 4)).toEqual([]);
+    expect(winningLines([3, 4, 5, 6], 4)).toEqual([]);
+    expect(winningLines([0, 6, 12, 18, 24], 4)).toEqual([]);
+    expect(
+      winningLines(
+        Array.from({ length: 16 }, (_, index) => index),
+        4,
+      ),
+    ).toHaveLength(10);
+  });
+
+  it.each([3, 4] as const)(
+    "recognizes a shared-game tie from size-%s winning lines",
+    (size) => {
+      let game = createSession(
+        "beginner",
+        ["Ada", "Bartek"],
+        "small-tie",
+        size,
+      );
+      for (const player of game.players)
+        for (let index = 0; index < size; index++)
+          game = correctCell(game, player.id, index);
+      game = startTieBreak(finishRound(drawRound(game, 0)));
+      expect(game.tieBreak?.contenders).toEqual(
+        game.players.map((player) => player.id),
+      );
+      expect(parseStoredSession(JSON.stringify(game))).toEqual(game);
+    },
+  );
+
+  it("restores legacy v1 saves without a size as 5×5 and rejects unknown keys", () => {
+    const game = correctCell(session(), "player-1", 24);
+    const { size: _size, ...legacy } = game;
+    expect(parseStoredSession(JSON.stringify(legacy))).toEqual({
+      ...game,
+      size: 5,
+    });
+    expect(
+      parseStoredSession(JSON.stringify({ ...legacy, unrelated: 3 })),
+    ).toBeNull();
+  });
+
+  it("rejects unsupported sizes instead of changing the board silently", () => {
+    for (const size of [0, 2, 6, 3.5, "3", null, [], {}]) {
+      expect(
+        parseStoredSession(JSON.stringify({ ...session(), size })),
+      ).toBeNull();
+    }
   });
 });

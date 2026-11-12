@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { Coffee, ExternalLink } from "lucide-react";
 import BingoGame from "./BingoGame";
 import PwaControls from "./PwaControls";
 import {
@@ -77,15 +77,26 @@ export default function App() {
       </main>
       <footer className="app-footer">
         <div className="app-toolbar">
-          <a
-            className="creator-link"
-            href={hiciarzUrl("editor", language)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("shell.createCards")}{" "}
-            <ExternalLink size={15} aria-hidden="true" />
-          </a>
+          <div className="footer-links">
+            <a
+              className="creator-link"
+              href={hiciarzUrl("editor", language)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("shell.createCards")}{" "}
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+            <a
+              className="support-link"
+              href="https://buymeacoffee.com/szymonrybka"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Coffee size={17} aria-hidden="true" />
+              {t("shell.buyCoffee")}
+            </a>
+          </div>
           <div
             className="language-switch"
             role="group"

@@ -6,7 +6,9 @@ import {
   bingoCategories,
   bingoColors,
   bingoLevels,
+  isBingoSize,
   type BingoLevel,
+  type BingoSize,
 } from "./bingo";
 
 export const bingoPageLayouts = [1, 2, 4] as const;
@@ -20,12 +22,14 @@ function drawGrid(
   x: number,
   y: number,
   size: number,
+  boardSize: BingoSize,
   compact = false,
 ) {
-  const cellSize = size / 5;
+  const cellSize = size / boardSize;
+  const textScale = 5 / boardSize;
   board.forEach((cat, cell) => {
-    const cx = x + (cell % 5) * cellSize;
-    const cy = y + Math.floor(cell / 5) * cellSize;
+    const cx = x + (cell % boardSize) * cellSize;
+    const cy = y + Math.floor(cell / boardSize) * cellSize;
     const colors = bingoColors[cat];
     doc.setFillColor(colors.fill);
     doc.setDrawColor(colors.ink);
@@ -40,11 +44,11 @@ function drawGrid(
       "FD",
     );
     doc.setTextColor(colors.ink);
-    doc.setFontSize(compact ? 11 : size > 100 ? 18 : 12);
+    doc.setFontSize((compact ? 11 : size > 100 ? 18 : 12) * textScale);
     doc.text(String(cat + 1), cx + cellSize / 2, cy + cellSize * 0.45, {
       align: "center",
     });
-    doc.setFontSize(compact ? 5.8 : size > 100 ? 9 : 5.3);
+    doc.setFontSize((compact ? 5.8 : size > 100 ? 9 : 5.3) * textScale);
     doc.text(categories[cat].short, cx + cellSize / 2, cy + cellSize * 0.75, {
       align: "center",
     });
@@ -57,6 +61,7 @@ export async function buildBingoPDF(
   seed: string = crypto.randomUUID(),
   options: {
     boardsPerPage?: BingoBoardsPerPage;
+    boardSize?: BingoSize;
     signal?: AbortSignal;
     onProgress?: (completed: number) => void;
   } = {},
@@ -69,6 +74,9 @@ export async function buildBingoPDF(
   if (!Number.isInteger(count) || count < 1 || count > 24)
     throw new Error(translate("bingoPdf.count"));
   const perPage = options.boardsPerPage ?? 2;
+  const boardSize = options.boardSize === undefined ? 5 : options.boardSize;
+  if (!isBingoSize(boardSize))
+    throw new Error(translate("bingoApp.invalidBoardSize"));
   if (!bingoPageLayouts.includes(perPage))
     throw new Error(translate("bingoApp.invalidPageLayout"));
   const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
@@ -97,15 +105,16 @@ export async function buildBingoPDF(
               ? 157
               : 14
             : 14,
-      board = bingoBoard(seed + ":" + index);
+      board = bingoBoard(seed + ":" + index, boardSize);
     doc.setTextColor("#263d34");
     doc.setFontSize(compact ? 8 : 9);
     doc.text("BINGO", x, y);
     doc.setFontSize(compact ? 7 : 8);
-    const boardLabel = translate("bingoPdf.board", {
-      level: levelName,
-      board: index + 1,
-    });
+    const boardLabel =
+      translate("bingoPdf.board", {
+        level: levelName,
+        board: index + 1,
+      }) + ` / ${boardSize} × ${boardSize}`;
     doc.text(
       boardLabel,
       compact ? x : x + width,
@@ -127,7 +136,7 @@ export async function buildBingoPDF(
     );
     const gy = y + (compact ? 22 : 18);
     const gridSize = perPage === 1 ? 182 : compact ? 90 : 100;
-    drawGrid(doc, board, categories, x, gy, gridSize, compact);
+    drawGrid(doc, board, categories, x, gy, gridSize, boardSize, compact);
 
     if (!compact) {
       doc.setTextColor("#263d34");
@@ -173,7 +182,10 @@ export async function buildBingoPDF(
     }
     doc.setTextColor("#526454");
     doc.setFontSize(compact ? 5.8 : 7);
-    const rules = doc.splitTextToSize(translate("bingoPdf.rules"), width);
+    const rules = doc.splitTextToSize(
+      translate("bingoPdf.rules", { size: boardSize }),
+      width,
+    );
     doc.text(
       rules,
       x,

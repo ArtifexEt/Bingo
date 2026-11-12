@@ -201,6 +201,35 @@ h3 {
 .creator-link:hover {
   text-decoration: underline;
 }
+.footer-links {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  min-width: 0;
+}
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #ead4a5;
+  border-radius: 8px;
+  background: #f5e5c2;
+  color: #745521;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.support-link:hover {
+  text-decoration: underline;
+}
+.app-footer .language-switch {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
 .language-switch {
   display: flex;
   gap: 2px;

@@ -6,11 +6,13 @@ import {
   bingoLevels,
   randomBingoCategory,
   type BingoLevel,
+  type BingoSize,
 } from "./bingo";
 import { useTranslation } from "./i18n";
 import BingoBoard from "./BingoBoard";
 import BingoCelebration from "./BingoCelebration";
 import AnswerModal from "./AnswerModal";
+import BoardSizeSelect from "./BoardSizeSelect";
 import Modal from "./Modal";
 import {
   BINGO_ROUND_MS,
@@ -27,27 +29,29 @@ import {
 import { personalSession } from "./bingo-personal";
 import "./bingo-play.css";
 
-const storageKey = (level: BingoLevel) => `bingo-game-${level}-v1`;
+const storageKey = (level: BingoLevel) => `bingo-game-${level}-v2`;
 function readGame(level: BingoLevel) {
-  let raw: string | null = null;
-  try {
-    raw = localStorage.getItem(storageKey(level));
-  } catch {
-    /* Saving is checked below. */
+  // Keep the size-aware save separate so an older open tab cannot overwrite it.
+  for (const key of [storageKey(level), `bingo-game-${level}-v1`]) {
+    try {
+      const saved = parseStoredSession(localStorage.getItem(key));
+      if (saved?.level === level) return personalSession(saved);
+    } catch {
+      /* Saving is checked below. */
+    }
   }
-  const saved = parseStoredSession(raw);
-  return saved?.level === level
-    ? personalSession(saved)
-    : createSession(level, ["1"]);
+  return createSession(level, ["1"]);
 }
 
 export default function BingoPlay({
   level,
   onLevelChange,
+  onBoardSizeChange,
   scannerUrl,
 }: {
   level: BingoLevel;
   onLevelChange: (level: BingoLevel) => void;
+  onBoardSizeChange: (size: BingoSize) => void;
   scannerUrl: string;
 }) {
   const { t } = useTranslation();
@@ -55,6 +59,7 @@ export default function BingoPlay({
   const [now, setNow] = useState(Date.now);
   const [past, setPast] = useState<BingoSession[]>([]);
   const [setup, setSetup] = useState(false);
+  const [setupSize, setSetupSize] = useState<BingoSize>(game.size);
   const [answerOpen, setAnswerOpen] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(true);
@@ -73,6 +78,10 @@ export default function BingoPlay({
   const remaining =
     deadline === null ? game.round.remainingMs : Math.max(0, deadline - now);
   const seconds = Math.ceil(remaining / 1000);
+
+  useEffect(() => {
+    onBoardSizeChange(game.size);
+  }, [game.size, onBoardSizeChange]);
 
   useEffect(() => {
     if (game.level !== level) {
@@ -140,9 +149,9 @@ export default function BingoPlay({
     if (next === game) return;
     if (undoable)
       setPast((history) => [...history.slice(-29), pausedSnapshot(game)]);
-    const hasBingo = winningLines(next.players[0].marks).length > 0;
+    const hasBingo = winningLines(next.players[0].marks, next.size).length > 0;
     if (next.id !== game.id || !hasBingo) setCelebration(null);
-    else if (!winningLines(player.marks).length)
+    else if (!winningLines(player.marks, game.size).length)
       setCelebration(++celebrationCount.current);
     setGame(next);
     setError("");
@@ -220,7 +229,10 @@ export default function BingoPlay({
           </button>
           <button
             className="quiet play-new-game"
-            onClick={() => setSetup(true)}
+            onClick={() => {
+              setSetupSize(game.size);
+              setSetup(true);
+            }}
           >
             <RotateCcw size={17} aria-hidden="true" />
             {t("play.newGame")}
@@ -241,6 +253,7 @@ export default function BingoPlay({
         <BingoBoard
           board={player}
           level={game.level}
+          size={game.size}
           onCell={(index) => apply(correctCell(game, player.id, index), true)}
         />
         <div className="play-board-footer">
@@ -354,11 +367,14 @@ export default function BingoPlay({
       {setup && (
         <Modal title={t("play.newGame")} onClose={() => setSetup(false)} sheet>
           <p>{t("play.resetWarning")}</p>
+          <div className="play-size-field">
+            <BoardSizeSelect value={setupSize} onChange={setSetupSize} />
+          </div>
           <div className="play-setup-actions">
             <button
               className="primary"
               onClick={() => {
-                apply(createSession(level, ["1"]));
+                apply(createSession(level, ["1"], undefined, setupSize));
                 setPast([]);
                 setSetup(false);
                 setNow(Date.now());

@@ -27,14 +27,6 @@ export default function BingoTitle() {
             {letter}
           </span>
         ))}
-        <svg className="bingo-title-music" viewBox="0 0 18 18" fill="none">
-          <path
-            d="M4 8v4M9 4v10M14 6v6"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-        </svg>
       </span>
     </h1>
   );
