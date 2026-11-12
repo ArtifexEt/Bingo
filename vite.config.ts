@@ -10,21 +10,45 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icon.svg", "icon-*.png", "fonts/*"],
+      includeAssets: [
+        "icon.svg",
+        "icon-*.png",
+        "apple-touch-icon.png",
+        "favicon-32.png",
+        "fonts/*",
+      ],
       manifest: {
-        name: "Bingo",
+        name: "Bingo — muzyczne bingo",
         short_name: "Bingo",
         id: base,
         start_url: base,
         scope: base,
         description:
-          "Muzyczne Bingo. Cyfrowe plansze, timer, rundy i plansze PDF do druku.",
+          "Twoja muzyczna plansza Bingo. Graj na telefonie, zapisuj odpowiedzi i świętuj Bingo, także offline.",
         lang: "pl",
         dir: "ltr",
         categories: ["games", "music"],
         theme_color: "#123f36",
         background_color: "#f6f5f1",
         display: "standalone",
+        shortcuts: [
+          {
+            name: "Na dobry początek",
+            short_name: "Początkujący",
+            url: `${base}?level=beginner`,
+            icons: [
+              { src: "icon-192.png", sizes: "192x192", type: "image/png" },
+            ],
+          },
+          {
+            name: "Dla znawców",
+            short_name: "Znawcy",
+            url: `${base}?level=expert`,
+            icons: [
+              { src: "icon-192.png", sizes: "192x192", type: "image/png" },
+            ],
+          },
+        ],
         icons: [
           {
             src: "icon.svg",
@@ -54,8 +78,7 @@ export default defineConfig({
       },
       workbox: {
         cacheId: "music-bingo",
-        // Activate new offline assets even while an older game tab is open.
-        // Saved boards live in localStorage and survive a page refresh.
+        // Let players finish an answer before explicitly applying a new version.
         skipWaiting: true,
         clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,svg,png,ttf,json}"],

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import BingoGame from "./BingoGame";
+import PwaControls from "./PwaControls";
 import {
   getLanguage,
   setLanguage,
@@ -92,6 +93,7 @@ export default function App() {
           ))}
         </div>
       </div>
+      <PwaControls />
       <BingoGame
         scannerUrl={hiciarzUrl("scanner", language)}
         sheet={route.sheet}

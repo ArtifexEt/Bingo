@@ -1,0 +1,22 @@
+{
+  "pwa.appControls": "Aplikacja Bingo",
+  "pwa.version": "Wersja aplikacji",
+  "pwa.localVersion": "Bingo · lokalnie",
+  "pwa.install": "Zainstaluj Bingo",
+  "pwa.installOpening": "Otwieram instalację…",
+  "pwa.iosShare": "Otwórz menu Udostępnij w przeglądarce.",
+  "pwa.iosAdd": "Wybierz „Do ekranu początkowego”, a następnie „Dodaj”.",
+  "pwa.installError": "Nie udało się otworzyć instalacji. Spróbuj przez menu przeglądarki.",
+  "pwa.check": "Sprawdź aktualizacje",
+  "pwa.checking": "Sprawdzam…",
+  "pwa.checked": "Sprawdzono aktualizacje.",
+  "pwa.newVersion": "Nowa wersja",
+  "pwa.updateReady": "Nowa wersja Bingo jest gotowa",
+  "pwa.updateHint": "Dokończ odpowiedź i zaktualizuj, gdy będzie dogodny moment. Twoja plansza i zapisane odpowiedzi pozostaną na urządzeniu.",
+  "pwa.update": "Aktualizuj",
+  "pwa.updating": "Aktualizuję…",
+  "pwa.later": "Później",
+  "pwa.updateError": "Nie udało się zastosować aktualizacji. Spróbuj ponownie lub zamknij i otwórz Bingo. Zapisane postępy są zachowane.",
+  "pwa.checkError": "Nie udało się sprawdzić aktualizacji. Spróbuj ponownie po połączeniu z internetem.",
+  "pwa.offline": "Grasz offline. Plansza i zapisane odpowiedzi są dostępne na tym urządzeniu. Odtwarzanie muzyki może wymagać internetu."
+}

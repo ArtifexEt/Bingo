@@ -1,0 +1,22 @@
+{
+  "pwa.appControls": "Bingo app",
+  "pwa.version": "App version",
+  "pwa.localVersion": "Bingo · local",
+  "pwa.install": "Install Bingo",
+  "pwa.installOpening": "Opening installation…",
+  "pwa.iosShare": "Open the browser’s Share menu.",
+  "pwa.iosAdd": "Choose “Add to Home Screen”, then “Add”.",
+  "pwa.installError": "Could not open installation. Try the browser’s menu.",
+  "pwa.check": "Check for updates",
+  "pwa.checking": "Checking…",
+  "pwa.checked": "Update check completed.",
+  "pwa.newVersion": "New version",
+  "pwa.updateReady": "A new version of Bingo is ready",
+  "pwa.updateHint": "Finish your answer and update when it suits you. Your board and saved answers will stay on this device.",
+  "pwa.update": "Update",
+  "pwa.updating": "Updating…",
+  "pwa.later": "Later",
+  "pwa.updateError": "Could not apply the update. Try again or close and reopen Bingo. Your saved progress is preserved.",
+  "pwa.checkError": "Could not check for updates. Try again when you are connected to the internet.",
+  "pwa.offline": "You’re playing offline. Your board and saved answers are available on this device. Playing music may need an internet connection."
+}

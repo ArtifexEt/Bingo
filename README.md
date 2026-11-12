@@ -7,7 +7,7 @@ Graj na cyfrowych planszach, prowadź rundy muzycznego Bingo i przygotuj plansze
 ## Korzystanie
 
 1. Każdy otwiera Bingo na własnym telefonie. Wybierz poziom: **Na dobry początek** lub **Dla znawców**. Każdy poziom zachowuje osobną planszę.
-2. Dotknij pola, aby je **wyszarzyć**; ponowne dotknięcie usuwa zaznaczenie. **Cofnij** odwraca ostatni ruch. **Nowa gra** tworzy nowy układ po potwierdzeniu.
+2. Dotknij pola, aby je **wyszarzyć i przekreślić dużym iksem**; ponowne dotknięcie usuwa zaznaczenie. **Cofnij** odwraca ostatni ruch. **Nowa gra** tworzy nowy układ po potwierdzeniu.
 3. Przycisk **Twoja odpowiedź** otwiera modal na cały ekran. Wybierz typ odpowiedzi i wpisz lub wybierz wartość. Po zatwierdzeniu odpowiedź jest zakryta; dotknij osłony, aby ją odsłonić. Możesz ponownie ją ukryć albo przygotować nową odpowiedź.
 4. Prowadzący może rozwinąć **Prowadzenie rundy**, wylosować kategorię, uruchomić muzykę skanerem i nacisnąć **Start 25 s**. Timer można wstrzymać; powrót z aplikacji muzycznej lub odświeżenie strony nie dodaje czasu.
 5. Po odsłonięciu karty sprawdźcie odpowiedzi. Poprawna odpowiedź pozwala zaznaczyć jedno wolne pole wylosowanej kategorii. Bonusy i dogrywki rozliczacie wspólnie, a każdy zmienia zaznaczenia na własnym telefonie.
@@ -22,6 +22,16 @@ Układy, zaznaczenia, odpowiedzi i timer są zapisywane lokalnie w przeglądarce
 Aplikacja ma polską i angielską wersję interfejsu i wydruków. Losowanie jest niezależne w każdej turze. [Zasady Hitster Bingo u wydawcy](https://hitstergame.com/pl-pl/pages/zasady-gry-bingo) są punktem odniesienia; odpowiedzi oceniają gracze na podstawie karty, nie automatyczne porównywanie tekstu.
 
 Talie muzyczne i karty QR przygotujesz w [kreatorze Hiciarza](https://artifexet.github.io/Hiciarz/?view=editor). Do uruchamiania muzyki z kart służy [skaner Hiciarza](https://artifexet.github.io/Hiciarz/?view=scanner) lub [aplikacja Android](https://github.com/ArtifexEt/Hiciarz/releases).
+
+## Instalacja i aktualizacje PWA
+
+Bingo można dodać do ekranu początkowego i otwierać jako osobną aplikację. W obsługiwanej przeglądarce użyj przycisku **Zainstaluj Bingo**. Na iPhonie lub iPadzie otwórz stronę w Safari; przycisk pokaże instrukcję **Udostępnij → Do ekranu początkowego → Dodaj**. Po instalacji przycisk znika.
+
+Po pierwszym pełnym załadowaniu interfejs, plansza i zapisane odpowiedzi działają offline. Ikony mają osobne wersje dla Androida, iOS i przeglądarki, w tym bezpieczny wariant maskable. Zainstalowana aplikacja oferuje skróty do obu poziomów, jeśli system je obsługuje.
+
+Aplikacja sprawdza nowe wersje po uruchomieniu, po powrocie na ekran i po odzyskaniu połączenia, a także co 10 minut. Możesz też wybrać **Sprawdź aktualizacje**. Gdy nowa wersja jest gotowa, **Aktualizuj** stosuje ją i odświeża stronę; **Później** pozwala dokończyć rundę. Samo wykrycie aktualizacji nie przeładowuje gry. Plansza i zatwierdzone odpowiedzi zostają na urządzeniu. Wersja widoczna w pasku aplikacji odpowiada opublikowanemu commitowi.
+
+Źródłem ikon jest `public/icon.svg`. PNG można odtworzyć poleceniem `node scripts/generate-icons.mjs`; generator korzysta z biblioteki `sharp` dostępnej jako narzędzie robocze. Dla zewnętrznej instalacji biblioteki podaj `--modules "ścieżka/do/node_modules"`. Zwykły build aplikacji korzysta z gotowych PNG i nie wymaga tej biblioteki.
 
 ## Linki do plansz
 
