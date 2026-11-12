@@ -1,0 +1,23 @@
+{
+  "answer.title": "Your answer",
+  "answer.chooseType": "What are you guessing?",
+  "answer.option.band": "Band",
+  "answer.option.solo": "Solo artist",
+  "answer.option.yes": "Yes",
+  "answer.option.no": "No",
+  "answer.decade": "{{year}}–{{end}}",
+  "answer.decadeLabel": "Decade",
+  "answer.chooseDecade": "Choose a decade",
+  "answer.yearLabel": "Release year",
+  "answer.valueLabel": "Answer",
+  "answer.textPlaceholder": "Type your answer…",
+  "answer.invalid": "Check your answer. Choose a valid value or shorten the text.",
+  "answer.saveHint": "Your answer will be covered after you confirm it.",
+  "answer.save": "Confirm and cover",
+  "answer.covered": "Answer saved",
+  "answer.revealHint": "Your answer stays hidden. Tap when it is time to check.",
+  "answer.reveal": "Reveal answer",
+  "answer.hide": "Cover again",
+  "answer.edit": "Edit",
+  "answer.new": "New answer"
+}

@@ -42,12 +42,14 @@ export default function Modal({
   onClose,
   wide = false,
   sheet = false,
+  fullscreen = false,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
   wide?: boolean;
   sheet?: boolean;
+  fullscreen?: boolean;
 }) {
   const { t } = useTranslation();
   const headingId = useId();
@@ -105,7 +107,8 @@ export default function Modal({
       className={
         "modal app-modal" +
         (wide ? " wide" : "") +
-        (sheet ? " bottom-sheet" : "")
+        (sheet ? " bottom-sheet" : "") +
+        (fullscreen ? " fullscreen" : "")
       }
       aria-labelledby={headingId}
       aria-modal="true"

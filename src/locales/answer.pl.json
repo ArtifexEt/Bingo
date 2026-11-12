@@ -1,0 +1,23 @@
+{
+  "answer.title": "Twoja odpowiedź",
+  "answer.chooseType": "Co odgadujesz?",
+  "answer.option.band": "Zespół",
+  "answer.option.solo": "Solista",
+  "answer.option.yes": "Tak",
+  "answer.option.no": "Nie",
+  "answer.decade": "Lata {{year}}–{{end}}",
+  "answer.decadeLabel": "Dekada",
+  "answer.chooseDecade": "Wybierz dekadę",
+  "answer.yearLabel": "Rok wydania",
+  "answer.valueLabel": "Odpowiedź",
+  "answer.textPlaceholder": "Wpisz odpowiedź…",
+  "answer.invalid": "Sprawdź odpowiedź. Podaj poprawną wartość lub skróć tekst.",
+  "answer.saveHint": "Po zatwierdzeniu odpowiedź zostanie zasłonięta.",
+  "answer.save": "Zatwierdź i zasłoń",
+  "answer.covered": "Odpowiedź zapisana",
+  "answer.revealHint": "Pozostaje ukryta. Dotknij, gdy będzie czas na sprawdzenie.",
+  "answer.reveal": "Odsłoń odpowiedź",
+  "answer.hide": "Zasłoń ponownie",
+  "answer.edit": "Edytuj",
+  "answer.new": "Nowa odpowiedź"
+}

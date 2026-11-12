@@ -65,7 +65,7 @@
   "components.BingoGame.drawAChallenge": "Losuj kategorię",
   "components.BingoGame.howToPlay": "Jak grać?",
   "components.BingoGame.drawACategoryAndScanA": "Wylosujcie kategorię i zeskanujcie muzyczną kartę jak zwykle. Dajcie sobie 25 sekund na odpowiedź, a potem odwróćcie kartę. Trafienie pozwala zaznaczyć jedno wolne pole danej kategorii. Pełny rząd, kolumna lub przekątna daje Bingo.",
-  "components.BingoGame.atBeginnerLevelGuessingTheExact": "Na początkowym poziomie dokładny rok w kategoriach ±2 i ±4 daje dodatkowo możliwość usunięcia jednego krzyżyka przeciwnika. Każde losowanie jest niezależne, więc kategoria może się powtórzyć.",
+  "components.BingoGame.atBeginnerLevelGuessingTheExact": "Na początkowym poziomie dokładny rok w kategoriach ±2 i ±4 daje dodatkowo możliwość usunięcia jednego zaznaczenia przeciwnika. Każde losowanie jest niezależne, więc kategoria może się powtórzyć.",
   "components.BingoGame.printableBoards": "Plansze do druku",
   "components.BingoGame.numberOfBoards": "Liczba plansz",
   "components.BingoGame.level": "Poziom:",

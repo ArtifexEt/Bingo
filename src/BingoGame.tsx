@@ -111,7 +111,7 @@ export default function BingoGame({
             <p>{t("components.BingoGame.drawACategoryAndScanA")}</p>
             <p>{t("components.BingoGame.atBeginnerLevelGuessingTheExact")}</p>
             <p>{t("play.helpDigital")}</p>
-            <p>{t("play.helpTie")}</p>
+            <p>{t("play.helpBingo")}</p>
             <a
               className="bingo-rules-link"
               href="https://hitstergame.com/pl-pl/pages/zasady-gry-bingo"

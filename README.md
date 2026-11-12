@@ -6,15 +6,16 @@ Graj na cyfrowych planszach, prowadź rundy muzycznego Bingo i przygotuj plansze
 
 ## Korzystanie
 
-1. Wybierz poziom: **Na dobry początek** lub **Dla znawców**. Każdy poziom zachowuje osobny stan gry.
-2. W **Nowej grze** ustaw od 1 do 12 graczy lub drużyn oraz ich nazwy.
-3. **Wspólna gra**: wylosuj kategorię, uruchom muzykę skanerem i dopiero wtedy naciśnij **Start 25 s**. Każdy może zapisać odpowiedź na swojej planszy. Timer można wstrzymać; powrót z aplikacji muzycznej lub odświeżenie strony nie dodaje czasu.
-4. Po odsłonięciu karty sprawdźcie odpowiedzi. Każda poprawna odpowiedź pozwala wybrać jedno wolne pole wylosowanej kategorii. **Cofnij** i **Korekta** służą do naprawienia pomyłek. Dokładny rok w początkujących kategoriach ±2 i ±4 odblokowuje ręczny bonus usunięcia krzyżyka przeciwnika, również gdy wszystkie własne pola kategorii są już zajęte.
-5. Pięć pól w rzędzie, kolumnie lub na przekątnej daje Bingo. Najpierw rozliczcie wszystkie odpowiedzi i bonusy rundy, potem potwierdźcie zwycięzcę. Przy remisie aplikacja prowadzi dogrywkę tylko między remisującymi.
+1. Każdy otwiera Bingo na własnym telefonie. Wybierz poziom: **Na dobry początek** lub **Dla znawców**. Każdy poziom zachowuje osobną planszę.
+2. Dotknij pola, aby je **wyszarzyć**; ponowne dotknięcie usuwa zaznaczenie. **Cofnij** odwraca ostatni ruch. **Nowa gra** tworzy nowy układ po potwierdzeniu.
+3. Przycisk **Twoja odpowiedź** otwiera modal na cały ekran. Wybierz typ odpowiedzi i wpisz lub wybierz wartość. Po zatwierdzeniu odpowiedź jest zakryta; dotknij osłony, aby ją odsłonić. Możesz ponownie ją ukryć albo przygotować nową odpowiedź.
+4. Prowadzący może rozwinąć **Prowadzenie rundy**, wylosować kategorię, uruchomić muzykę skanerem i nacisnąć **Start 25 s**. Timer można wstrzymać; powrót z aplikacji muzycznej lub odświeżenie strony nie dodaje czasu.
+5. Po odsłonięciu karty sprawdźcie odpowiedzi. Poprawna odpowiedź pozwala zaznaczyć jedno wolne pole wylosowanej kategorii. Bonusy i dogrywki rozliczacie wspólnie, a każdy zmienia zaznaczenia na własnym telefonie.
+6. Pięć pól w rzędzie, kolumnie lub na przekątnej daje **Bingo** i uruchamia konfetti oraz fajerwerki. Efekt trwa 7 sekund, nie blokuje planszy i respektuje systemową opcję ograniczenia ruchu.
 
-**Moja plansza** to widok gracza na własnym telefonie lub tablecie: dotknięcie pola stawia lub usuwa krzyżyk, a kategorię i czas podaje prowadzący. Plansze na różnych urządzeniach nie są synchronizowane. Wspólna gra zarządza wieloma planszami na jednym urządzeniu. Układ tabletu pokazuje sterowanie rundą i planszę obok siebie; telefon oferuje widok samej planszy.
+Każde urządzenie ma jedną własną planszę, bez nazw i wyboru gracza. Postępy nie są synchronizowane między urządzeniami. Aktualizacja starej gry zachowuje aktywną planszę i jej zaznaczenia.
 
-Układy, zaznaczenia, odpowiedzi i rozgrywka są zapisywane lokalnie w przeglądarce. Zmiana języka, obrót ekranu i odświeżenie zachowują plansze. Zapis nie jest kopią zapasową: wyczyszczenie danych witryny usuwa postępy. Po pierwszym załadowaniu aplikacja działa również offline; odtwarzanie muzyki pozostaje w osobnym skanerze.
+Układy, zaznaczenia, odpowiedzi i timer są zapisywane lokalnie w przeglądarce. Zmiana języka, obrót ekranu i odświeżenie zachowują planszę. Zapis nie jest kopią zapasową: wyczyszczenie danych witryny usuwa postępy. Po pierwszym załadowaniu aplikacja działa również offline; odtwarzanie muzyki pozostaje w osobnym skanerze.
 
 **Drukuj plansze**: wybierz od 1 do 24 plansz oraz 1, 2 lub 4 plansze na stronie A4. Pobierz PDF albo otwórz podgląd do drukowania. Drukuj jednostronnie w skali 100%; układy z kilkoma planszami zawierają linie cięcia. Cyfrowe i drukowane plansze mają siatkę 5 × 5, bez darmowego środkowego pola. Generator PDF przygotowuje nowe układy, a nie kopię aktualnej cyfrowej rozgrywki.
 

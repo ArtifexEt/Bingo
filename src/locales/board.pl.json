@@ -1,6 +1,7 @@
 {
   "board.markedCount": "Zaznaczone pola: {{count}} z 25",
-  "board.bingo": "Bingo! {{name}} ma pełną linię.",
+  "board.title": "Twoja plansza",
+  "board.bingo": "Bingo! Masz pełną linię.",
   "board.cell": "Wiersz {{row}}, kolumna {{column}}. Kategoria {{category}}: {{name}}. {{state}}. {{action}}.",
   "board.marked": "Zaznaczone",
   "board.unmarked": "Niezaznaczone",
