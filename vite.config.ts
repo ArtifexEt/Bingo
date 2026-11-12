@@ -54,6 +54,10 @@ export default defineConfig({
       },
       workbox: {
         cacheId: "music-bingo",
+        // Activate new offline assets even while an older game tab is open.
+        // Saved boards live in localStorage and survive a page refresh.
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,svg,png,ttf,json}"],
         maximumFileSizeToCacheInBytes: 4000000,
         cleanupOutdatedCaches: true,
