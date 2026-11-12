@@ -65,42 +65,47 @@ export default function App() {
   }, [language, route]);
 
   return (
-    <main className="bingo-app">
-      <div className="app-toolbar">
-        <a
-          className="creator-link"
-          href={hiciarzUrl("editor", language)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t("shell.createCards")} <ExternalLink size={15} aria-hidden="true" />
-        </a>
-        <div
-          className="language-switch"
-          role="group"
-          aria-label={t("shell.language")}
-        >
-          {(["pl", "en"] as const).map((value: Language) => (
-            <button
-              key={value}
-              type="button"
-              lang={value}
-              aria-pressed={language === value}
-              onClick={() => navigate(route, value)}
-            >
-              {value.toUpperCase()}
-            </button>
-          ))}
+    <div className="bingo-app">
+      <main>
+        <BingoGame
+          scannerUrl={hiciarzUrl("scanner", language)}
+          sheet={route.sheet}
+          onSheetChange={(sheet) => navigate({ ...route, sheet })}
+          level={route.level}
+          onLevelChange={(level) => navigate({ ...route, level })}
+        />
+      </main>
+      <footer className="app-footer">
+        <div className="app-toolbar">
+          <a
+            className="creator-link"
+            href={hiciarzUrl("editor", language)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t("shell.createCards")}{" "}
+            <ExternalLink size={15} aria-hidden="true" />
+          </a>
+          <div
+            className="language-switch"
+            role="group"
+            aria-label={t("shell.language")}
+          >
+            {(["pl", "en"] as const).map((value: Language) => (
+              <button
+                key={value}
+                type="button"
+                lang={value}
+                aria-pressed={language === value}
+                onClick={() => navigate(route, value)}
+              >
+                {value.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-      <PwaControls />
-      <BingoGame
-        scannerUrl={hiciarzUrl("scanner", language)}
-        sheet={route.sheet}
-        onSheetChange={(sheet) => navigate({ ...route, sheet })}
-        level={route.level}
-        onLevelChange={(level) => navigate({ ...route, level })}
-      />
-    </main>
+        <PwaControls />
+      </footer>
+    </div>
   );
 }

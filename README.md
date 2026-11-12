@@ -25,11 +25,11 @@ Talie muzyczne i karty QR przygotujesz w [kreatorze Hiciarza](https://artifexet.
 
 ## Instalacja i aktualizacje PWA
 
-Bingo można dodać do ekranu początkowego i otwierać jako osobną aplikację. W obsługiwanej przeglądarce użyj przycisku **Zainstaluj Bingo**. Na iPhonie lub iPadzie otwórz stronę w Safari; przycisk pokaże instrukcję **Udostępnij → Do ekranu początkowego → Dodaj**. Po instalacji przycisk znika.
+Bingo można dodać do ekranu początkowego i otwierać jako osobną aplikację. W obsługiwanej przeglądarce użyj przycisku **Zainstaluj Bingo** w stopce. Na iPhonie lub iPadzie otwórz stronę w Safari; przycisk pokaże instrukcję **Udostępnij → Do ekranu początkowego → Dodaj**. Po instalacji przycisk znika.
 
 Po pierwszym pełnym załadowaniu interfejs, plansza i zapisane odpowiedzi działają offline. Ikony mają osobne wersje dla Androida, iOS i przeglądarki, w tym bezpieczny wariant maskable. Zainstalowana aplikacja oferuje skróty do obu poziomów, jeśli system je obsługuje.
 
-Aplikacja sprawdza nowe wersje po uruchomieniu, po powrocie na ekran i po odzyskaniu połączenia, a także co 10 minut. Możesz też wybrać **Sprawdź aktualizacje**. Gdy nowa wersja jest gotowa, **Aktualizuj** stosuje ją i odświeża stronę; **Później** pozwala dokończyć rundę. Samo wykrycie aktualizacji nie przeładowuje gry. Plansza i zatwierdzone odpowiedzi zostają na urządzeniu. Wersja widoczna w pasku aplikacji odpowiada opublikowanemu commitowi.
+Aplikacja sprawdza nowe wersje po uruchomieniu, po powrocie na ekran i po odzyskaniu połączenia, a także co 10 minut. Możesz też wybrać **Sprawdź aktualizacje** w stopce. Gdy nowa wersja jest gotowa, **Aktualizuj** stosuje ją i odświeża stronę; **Później** pozwala dokończyć rundę. Samo wykrycie aktualizacji nie przeładowuje gry. Plansza i zatwierdzone odpowiedzi zostają na urządzeniu. Wersja widoczna w stopce aplikacji odpowiada opublikowanemu commitowi. W tym samym miejscu znajdziesz zmianę języka i link do kreatora kart Hiciarza.
 
 Źródłem ikon jest `public/icon.svg`. PNG można odtworzyć poleceniem `node scripts/generate-icons.mjs`; generator korzysta z biblioteki `sharp` dostępnej jako narzędzie robocze. Dla zewnętrznej instalacji biblioteki podaj `--modules "ścieżka/do/node_modules"`. Zwykły build aplikacji korzysta z gotowych PNG i nie wymaga tej biblioteki.
 

@@ -164,8 +164,24 @@ h3 {
   }
 }
 .bingo-app {
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
   padding: 24px 24px 32px;
+}
+.bingo-app > main {
+  flex: 1;
+  width: 100%;
+}
+.app-footer {
+  width: 100%;
+  max-width: 720px;
+  margin: 28px auto 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.app-footer .pwa-controls {
+  margin-top: 8px;
 }
 .app-toolbar {
   display: flex;
@@ -173,7 +189,7 @@ h3 {
   justify-content: space-between;
   gap: 16px;
   max-width: 720px;
-  margin: 0 auto 20px;
+  margin: 0 auto;
 }
 .creator-link {
   display: inline-flex;
@@ -208,17 +224,12 @@ h3 {
 }
 @media (max-width: 980px) {
   .bingo-app {
-    display: flex;
-    flex-direction: column;
-    padding: 0 0 max(16px, env(safe-area-inset-bottom, 0px));
+    padding: max(8px, env(safe-area-inset-top, 0px)) 0
+      max(16px, env(safe-area-inset-bottom, 0px));
   }
-  .app-toolbar {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: calc(8px + env(safe-area-inset-top, 0px))
-      max(18px, env(safe-area-inset-right, 0px)) 0
-      max(18px, env(safe-area-inset-left, 0px));
+  .app-footer {
+    padding-inline: max(18px, env(safe-area-inset-left, 0px))
+      max(18px, env(safe-area-inset-right, 0px));
   }
   .bingo-shell {
     padding-top: 4px;

@@ -6,6 +6,7 @@ import { preparePDFPreview } from "./pdf-preview";
 import type { BingoBoardsPerPage } from "./bingo-pdf";
 import Modal from "./Modal";
 import BingoPlay from "./BingoPlay";
+import BingoTitle from "./BingoTitle";
 import "./bingo.css";
 
 export type BingoSheet = "help" | "print" | null;
@@ -74,7 +75,7 @@ export default function BingoGame({
   return (
     <section className="bingo-shell" aria-labelledby="bingo-title">
       <header className="bingo-heading">
-        <h1 id="bingo-title">{t("components.BingoGame.musicBingo")}</h1>
+        <BingoTitle />
         <div className="bingo-tools">
           <button
             className="bingo-tool"

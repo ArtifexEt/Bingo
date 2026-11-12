@@ -205,12 +205,16 @@
   }
 }
 @media (max-width: 360px) {
+  .bingo-shell .bingo-heading {
+    gap: 6px;
+  }
   .bingo-heading h1 {
     font-size: 24px;
   }
-  .bingo-tool.bingo-boards-entry {
+  .bingo-shell .bingo-tool.bingo-boards-entry {
     font-size: 11px;
     gap: 5px;
+    padding-inline: 4px;
   }
   .play-round {
     grid-template-columns: minmax(0, 1fr) minmax(115px, 0.65fr);
