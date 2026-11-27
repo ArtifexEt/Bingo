@@ -1,6 +1,6 @@
 # Muzyczne Bingo
 
-Graj na cyfrowych planszach, prowadź rundy muzycznego Bingo i przygotuj plansze do druku. Samodzielna aplikacja webowa wydzielona z [Hiciarza](https://github.com/ArtifexEt/Hiciarz).
+Graj na cyfrowych planszach, prowadź rundy muzycznego Bingo i przygotuj plansze do druku. Samodzielna aplikacja webowa wydzielona z [Hiciarza](https://hiciarz.com/).
 
 **[Otwórz Bingo](https://artifexet.github.io/Bingo/)** · **[Plansze do druku](https://artifexet.github.io/Bingo/?sheet=print&level=beginner&lang=pl)**
 
@@ -21,7 +21,7 @@ Układy, zaznaczenia, odpowiedzi i timer są zapisywane lokalnie w przeglądarce
 
 Aplikacja ma polską i angielską wersję interfejsu i wydruków. Losowanie jest niezależne w każdej turze. [Zasady Hitster Bingo u wydawcy](https://hitstergame.com/pl-pl/pages/zasady-gry-bingo) są punktem odniesienia; odpowiedzi oceniają gracze na podstawie karty, nie automatyczne porównywanie tekstu.
 
-Talie muzyczne i karty QR przygotujesz w [kreatorze Hiciarza](https://artifexet.github.io/Hiciarz/?view=editor). Do uruchamiania muzyki z kart służy [skaner Hiciarza](https://artifexet.github.io/Hiciarz/?view=scanner) lub [aplikacja Android](https://github.com/ArtifexEt/Hiciarz/releases).
+Talie muzyczne i karty QR przygotujesz w [kreatorze Hiciarza](https://hiciarz.com/?view=editor). Do uruchamiania muzyki z kart służy [skaner Hiciarza](https://hiciarz.com/?view=scanner) lub natywna aplikacja na Androida.
 
 ## Instalacja i aktualizacje PWA
 
@@ -43,7 +43,7 @@ Aplikacja sprawdza nowe wersje po uruchomieniu, po powrocie na ekran i po odzysk
 
 Przykłady: [podstawowy PL](https://artifexet.github.io/Bingo/?sheet=print&level=beginner&lang=pl), [zaawansowany PL](https://artifexet.github.io/Bingo/?sheet=print&level=expert&lang=pl), [beginner EN](https://artifexet.github.io/Bingo/?sheet=print&level=beginner&lang=en).
 
-Dotychczasowe adresy Hiciarza z `?view=bingo` przekierowują do nowej aplikacji z zachowaniem prawidłowego poziomu, języka i okna druku lub pomocy.
+Adres [hiciarz.com/?view=bingo](https://hiciarz.com/?view=bingo) przekierowuje do Bingo z zachowaniem prawidłowego poziomu, języka i okna druku lub pomocy.
 
 ## Uruchomienie lokalne
 

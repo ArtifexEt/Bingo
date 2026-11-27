@@ -34,10 +34,10 @@ describe("standalone Bingo links", () => {
 
   it("links only the selected language and destination to Hiciarz", () => {
     expect(hiciarzUrl("scanner", "en")).toBe(
-      "https://artifexet.github.io/Hiciarz/?view=scanner&lang=en",
+      "https://hiciarz.com/?view=scanner&lang=en",
     );
     expect(hiciarzUrl("editor", "pl")).toBe(
-      "https://artifexet.github.io/Hiciarz/?view=editor&lang=pl",
+      "https://hiciarz.com/?view=editor&lang=pl",
     );
   });
 });
