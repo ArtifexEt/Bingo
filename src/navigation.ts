@@ -43,7 +43,7 @@ export function hiciarzUrl(
   view: "editor" | "scanner",
   language: Language,
 ): string {
-  const url = new URL("https://artifexet.github.io/Hiciarz/");
+  const url = new URL("https://hiciarz.com/");
   url.search = new URLSearchParams({ view, lang: language }).toString();
   return url.href;
 }
